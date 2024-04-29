@@ -17,7 +17,7 @@ class LoginPage:
             if user_info['username'] == entered_username and user_info['password'] == entered_password:
                 if user_info['type'] == 'admin':
                     new_window = Toplevel(self.window)
-                    run_admin( new_window)
+                    run_admin( new_window,user_info)
                     self.window.withdraw() 
                 elif user_info['type'] == 'user':
                     new_window = Toplevel(self.window)
@@ -35,7 +35,8 @@ class LoginPage:
         self.window.geometry('965x606+50+50')
         self.window.resizable(0, 0)
         self.window.state('zoomed')
-        self.window.title('Login Page')
+        self.window.title('Trang đăng nhập')
+        self.window.iconbitmap('images//changepw.ico')
 
         # ========================================================================
         # ============================background image============================

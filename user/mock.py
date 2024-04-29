@@ -7,7 +7,6 @@ class adminPage:
 
     def __init__(self, master):
         self.window = master
-        self.window.geometry("{0}x{1}+0+0".format(self.window.winfo_screenwidth(), self.window.winfo_screenheight()))
         self.create_header()
         self.create_sidebar()
         self.create_main_content()
@@ -78,6 +77,11 @@ class adminPage:
     def clear_main_content(self):
         for widget in self.main_frame.winfo_children():
                         widget.destroy()
+
+def run_admin(window):
+   # window = Tk()
+    window.geometry("{0}x{1}+0+0".format(window.winfo_screenwidth(), window.winfo_screenheight()))
+    adminPage(window)
 
 def page():
     window = Tk()
