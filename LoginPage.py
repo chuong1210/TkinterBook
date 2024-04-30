@@ -21,7 +21,7 @@ class LoginPage:
                     self.window.withdraw() 
                 elif user_info['type'] == 'user':
                     new_window = Toplevel(self.window)
-                    run_user( new_window)
+                    run_user( new_window,user_info)
                     self.window.withdraw() 
                 else:
                     print("Unknown user type.")
@@ -140,7 +140,7 @@ class LoginPage:
         # ========================================================================
        
         self.login = Button(self.lgn_frame, text='Đăng nhập', command=self.login_function ,font=("times new roman", 14, "bold"), width=25, bd=0,
-                            bg='#3047ff', cursor='hand2', activebackground='#3047ff', fg='white')
+                            bg='#3047ff', cursor='hand2', activebackground='#8865ff', fg='white')
         self.login.place(x=580, y=450)
         self.error_message_label = Label(self.lgn_frame, text='', bg="#1974d3")
         self.error_message_label.place(x=580, y=427)

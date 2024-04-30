@@ -2,6 +2,11 @@
 from tkinter import *
 from PIL import ImageTk, Image,ImageDraw
 import json
+import requests
+from io import BytesIO
+from book_detail import BookDetailWindow
+import threading
+from time import sleep
 colorBg="f0f8ff"
 with open('json_file\\users_login.json') as f:
     user_data = json.load(f)
@@ -11,8 +16,11 @@ class adminPage:
     def __init__(self, master,user_info):
         self.window = master
         self.window.geometry("{0}x{1}+0+0".format(self.window.winfo_screenwidth(), self.window.winfo_screenheight()))
+        self.window.title('Trang Admin')
         self.create_header()
         self.create_sidebar()
+        self.create_header_line()
+
         self.create_main_content()
         self.current_user = user_info
         self.window.grid_rowconfigure(0, weight=0)  # Header không nên mở rộng khi cửa sổ được chỉnh kích thước
@@ -21,15 +29,17 @@ class adminPage:
         self.window.grid_columnconfigure(1, weight=1)  # Main frame nên mở rộng
 
     def create_sidebar(self):
-        sidebar_frame = Frame(self.window, width=200, bg='#a0a0a0')
+        sidebar_frame = Frame(self.window, width=200, bg='#108690')
         #sidebar_frame.grid(row=1, column=0, sticky='ns')
-        sidebar_frame.pack(fill='y', side='left')
+        #sidebar_frame.pack(fill='y', side='left')
+        sidebar_frame.place(relheight=1, relwidth=0.09)
+
         # tải và hiển thị avatar người dùng
         self.pil_image = Image.open('images\\CHUONG.png')
 
         width, height = self.pil_image.size
-        new_width = width // 8
-        new_height = height // 8
+        new_width = width // 7
+        new_height = height // 7
         self.pil_image = self.pil_image.resize((new_width, new_height))
 # Tạo hình tròn bằng cách cắt ảnh
         mask = Image.new("L", (new_width, new_height), 0)
@@ -39,29 +49,33 @@ class adminPage:
         self.pil_image = Image.composite(self.pil_image, Image.new("RGBA", (new_width, new_height), 0), mask)
 # Tạo mặt nạ hình tròn để hình ảnh
         self.avatar_img = ImageTk.PhotoImage(self.pil_image)  
-        avatar_label = Label(sidebar_frame, image=self.avatar_img, bg='#a0a0a0')
+        avatar_label = Label(sidebar_frame, image=self.avatar_img, bg='#108690',cursor='hand1')
         avatar_label.image = self.avatar_img  # Lưu hình ảnh để tránh bị Python hủy
-        avatar_label.pack(side='left', pady=10)
+        avatar_label.pack(side='top', pady=10)
+        avatar_label.bind("<Button-1>", lambda e: self.create_main_content()) 
         settings_menu = Menu(self.window, tearoff=0)
-        settings_menu.add_command(label="Đổi mật khẩu", command=self.replace_password)
+        settings_menu.add_command(label="Đổi mật khẩu", command=self.replace_password,background='#108690')
         settings_menu.add_command(label="Xem thông tin tài khoản", command=self.view_account_info)
 
         self.settings_button_text = StringVar()
         self.settings_button_text.set('Cài đặt ▼') 
         sidebar_frame.grid_columnconfigure(0, weight=1)  # Cần thiết để các nút mở rộng khi cửa sổ được chỉnh kích thước
 
-        settings_button = Button(sidebar_frame, textvariable=self.settings_button_text, command=lambda: self.settings_menu_show_hide(settings_menu, settings_button))
-        settings_button.pack(pady=10)
-        settings_button.grid(row=0, sticky='nsew')
-        user_management_button = Button(sidebar_frame, text="Quản lý người dùng", command=self.manage_users)
-        user_management_button.grid(row=1, sticky='nsew')
-        book_management_button = Button(sidebar_frame, text="Quản lý sách", command=self.manage_books)
-        book_management_button.grid(row=2, sticky='nsew')
+        settings_button = Button(sidebar_frame, fg='#fff',textvariable=self.settings_button_text, command=lambda: self.settings_menu_show_hide(settings_menu, settings_button),bg='#108690',height=2)
+        settings_button.pack(side='top', fill='x', pady=10)
+        user_management_button = Button(sidebar_frame, fg='#fff', text="Quản lý người dùng", command=self.manage_users,bg='#108690',height=2)
+        user_management_button.pack(side='top', fill='x', pady=10)
+        book_management_button = Button(sidebar_frame,  fg='#fff',text="Quản lý sách", command=self.manage_books,bg='#108690',height=2)
+        book_management_button.pack(side='top', fill='x', pady=10)
+        book_management_button = Button(sidebar_frame,  fg='#fff',text="Quản lý nhà xuất bản", command=self.manage_books,bg='#108690',height=2)
+        book_management_button.pack(side='top', fill='x', pady=10)
 
     def create_header(self):
 # tạo header frame
-        header_frame = Frame(self.window, height=100, bg='#a0a0a0')
-        header_frame.pack(fill='x')
+        header_frame = Frame(self.window, height=200, bg='#108690')
+        #header_frame.pack(fill='x')
+        header_frame.place(rely=0, relx=0.09, relwidth=0.92, relheight=0.12)
+
         #header_frame.grid(row=0, column=0, columnspan=2, sticky='we')  # grid thay cho pack
 
 
@@ -80,6 +94,10 @@ class adminPage:
         # tạo hộp nhập vào cho tìm kiếm sách
         book_search_entry = Entry(header_frame)
         book_search_entry.pack(side='left', padx=10)
+        
+        search_button = Button(header_frame, text="Tìm kiếm sách", 
+                               command=lambda: self.threaded_function(book_search_entry))
+        search_button.pack(side='left', padx=10)
 
 
 
@@ -113,13 +131,24 @@ class adminPage:
 
     def create_main_content(self):
         self.main_frame = Frame(self.window)
-        self.main_frame.pack(expand=True)
-       # self.main_frame.grid(row=1, column=1, sticky='nsew')
-        self.home_page()
+        self.main_frame.place(relx=0.093, rely=0.12, relwidth=0.912, relheight=0.845) 
+
+    # creating background image widget
+        self.bg_image = Image.open('images\\bgmain.jpg')
+        self.bg_photo_image = ImageTk.PhotoImage(self.bg_image)
+        self.bg_label = Label(self.main_frame, image=self.bg_photo_image)
+        self.bg_label.place(x=0, y=0, relwidth=0.99, relheight=0.845)
+    
+    # creating overlying label widget
+        self.home_label = Label(self.main_frame, text="Đây là trang admin", font=("Helvetica", 40), fg='#000')
+        self.home_label.place(relx=0.5, rely=0.5, anchor='center') 
+        self.display_all_books_json()
+
+    # And bind this method to the window resize event:
 
     def home_page(self):
         self.clear_main_content()
-        Label(self.main_frame, text="Đây là trang chính cho admin", font=("Helvetica", 40)).pack(expand=True)
+        Label(self.main_frame, text="Đây là trang chính cho admin", font=("Helvetica", 40),relief='ridge').pack(expand=True)
 
     def manage_users(self):
         self.clear_main_content()
@@ -147,7 +176,7 @@ class adminPage:
         self.window.resizable(0, 0)
 
     # ====== Username ====================
-        username_entry = Entry(self.window, fg="#a7a7a7", font=("arial semibold", 12), highlightthickness=2)
+        username_entry = Entry(self.window, fg="#a7a7a7", font=("arial semibold", 12), highlightthickness=2,cursor="hand2")
         username_entry.insert(0, self.current_user['username'])  # Set the default value
         username_entry.config(state='disabled')
         username_entry.place(x=40, y=30, width=256, height=34)
@@ -156,17 +185,17 @@ class adminPage:
         username_lbel.place(x=40, y=0)
 
     # ====  New Password ==================
-        old_password_entry = Entry(self.window, fg="#a7a7a7", font=("arial semibold", 12), show='•', highlightthickness=2)
+        old_password_entry = Entry(self.window, fg="#280659", font=("arial semibold", 12), show='•', highlightthickness=3)
         old_password_entry.place(x=40, y=110, width=256, height=34)
         old_password_entry.config(highlightbackground="black", highlightcolor="black")
-        old_password_label = Label(self.window, text='Nhập lại Mật khẩu cũ', fg="#89898b", bg='#f8f8f8', font=("arial", 12, 'bold'))
+        old_password_label = Label(self.window, text='Nhập lại Mật khẩu cũ', fg="#000", bg='#f8f8f8', font=("arial", 12, 'bold'))
         old_password_label.place(x=40, y=80)
 
     # ====  Confirm Password ==================
-        new_password_entry = Entry(self.window, fg="#a7a7a7", font=("arial semibold", 12), show='•', highlightthickness=2)
+        new_password_entry = Entry(self.window, fg="#280659", font=("arial semibold", 12), show='•', highlightthickness=3)
         new_password_entry.place(x=40, y=190, width=256, height=34)
         new_password_entry.config(highlightbackground="black", highlightcolor="black")
-        new_password_label = Label(self.window, text='Mật khẩu mới', fg="#89898b", bg='#f8f8f8',
+        new_password_label = Label(self.window, text='Mật khẩu mới', fg="#000", bg='#f8f8f8',
                                    font=("arial", 12, 'bold'))
         new_password_label.place(x=40, y=160)
       
@@ -174,7 +203,7 @@ class adminPage:
         error_message_label.place (x=40, y=230)
     # ======= Update password Button ============
         update_pass = Button(self.window, fg='#f8f8f8',command=lambda: self.change_password_inFile(old_password_entry,new_password_entry,error_message_label), text='Cập nhật mật khẩu', bg='#1b87d2', font=("arial bold", 14),
-                         cursor='hand2', activebackground='#1b87d2')
+                         cursor='hand2', activebackground='#000181')
         update_pass.place(x=40, y=255, width=256, height=50)
     def change_password_inFile(self, old_pass_entry, new_pass_entry,error_message_label):
         old_pass = old_pass_entry.get()
@@ -189,7 +218,7 @@ class adminPage:
                 if user['username'] == self.current_user['username']:
                     user['password'] = new_pass
 
-            # Lưu lại database
+            # Lưu lại json file
             with open('json_file\\users_login.json', 'w') as f:
                 json.dump(user_data, f)
             error_message_label.config(text='Mật khẩu được cập nhật thành công.', fg='green')
@@ -198,7 +227,114 @@ class adminPage:
             error_message_label.config(text='Mật khẩu cũ không đúng.', fg='red')     
  
 
+    def create_header_line(self):
+        # tạo một dòng phân cách giữa header và sidebar
+        header_line = Frame(self.window, width=5, bg='black')
+        header_line.place(relx=0.09, relheight=1)
+    def threaded_function(self,book_entry):
+        book_to_search = book_entry.get() 
+        if book_to_search.strip() != '':
+            response = requests.get('https://www.googleapis.com/books/v1/volumes?q=' + book_to_search)
 
+            if response.status_code == 200:
+                response_dict = response.json()
+                for widget in self.main_frame.winfo_children(): # Clear all children widgets in main_frame
+                    widget.destroy()
+
+                row=0
+                column=0
+                for item in response_dict['items']:
+                    book_info = item['volumeInfo']
+                    book_frame = Frame(self.main_frame)
+                    book_frame.grid(row=row, column=column, padx=10, pady=10)  # Use grid() instead of pack()
+                
+
+                    try:
+                        img_url = book_info['imageLinks']['thumbnail']
+                        img_response = requests.get(img_url)
+                        img_data = img_response.content
+                        img = ImageTk.PhotoImage(Image.open(BytesIO(img_data)))
+                    
+                        cover_label = Label(book_frame, image=img,cursor='hand2')
+                        cover_label.bind("<Button-1>", lambda e: BookDetailWindow(self.window, book_info))
+                        cover_label.image = img
+                        cover_label.pack()
+                        title = book_info['title']
+                        if len(title) > 40:  # Adjust value as needed
+                            title = title[:37] + "..."
+                            print(title,"dist")
+
+
+
+                        info_label = Label(book_frame, text=f"Title: {title}\nAuthor: {', '.join(book_info['authors'])[:30]}", justify=LEFT)  # Cut authors if too long
+                        info_label.pack()
+                        column += 1
+                        if column == 5:
+                            column = 0
+                            row += 1
+                    except KeyError:
+                        pass
+            else:
+                 self.display_all_books_json()
+    def display_all_books_json(self):
+    # Đọc file JSON
+        with open('json_file\\books_detail.json', 'r', encoding='utf-8') as f:
+            data = json.load(f)
+    
+    # Xóa nội dung hiện tại của main_frame
+        self.clear_main_content()
+    
+        row = 0
+        column = 0
+        for book in data['books']:
+            book_frame = Frame(self.main_frame)
+            book_frame.grid(row=row, column=column, padx=10, pady=10)
+
+    # Hiển thị hình ảnh sách nếu có
+            if 'image_path' in book:
+                img = Image.open(book['image_path'])
+
+            # Resize hình ảnh
+                max_height = 200  # Điều chỉnh giá trị này theo nhu cầu của bạn
+                max_width = 200  # Điều chỉnh giá trị này theo nhu cầu của bạn
+                width, height = img.size
+                aspect_ratio = width / height
+
+                if width > max_width:
+                    width = max_width
+                    height = width / aspect_ratio
+
+                if height > max_height:
+                    height = max_height
+                    width = height * aspect_ratio
+
+                img = img.resize((int(width), int(height)))
+
+                photoImg =  ImageTk.PhotoImage(img)
+                cover_label = Label(book_frame, image=photoImg,cursor='hand2')
+                cover_label.image = photoImg  # Lưu hình ảnh để tránh bị Python hủy
+                cover_label.pack()
+
+    # Hiển thị thông tin sách
+            title = book['title']
+            if len(title) > 40:  # Cắt tiêu đề nếu quá dài
+                title = title[:37] + "..."
+            author = book['author']
+            info_label = Label(book_frame, text=f"{title}\nAuthor: {author}", justify=LEFT)
+
+            info_label.pack()
+
+            column += 1
+            if column == 5:
+                column = 0
+                row += 1
+    def get_book_info(self):
+    # Show loading image while fetching book info
+        self.loading_label.config(image=loading_img)
+
+    # Create and start new thread to fetch book info
+        thread = threading.Thread(target=threaded_function())
+        thread.start()
 def run_admin(window,user_info):
    # window = Tk()
     adminPage(window,user_info)
