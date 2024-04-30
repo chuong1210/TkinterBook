@@ -1,0 +1,24 @@
+{
+    "books": [
+        {
+            "title": "Tiểu thuyết 1",
+            "author": "Tác giả A",
+            "genre": "Tiểu thuyết",
+            "year": 1990,
+            "pages": 350,
+            "file_path": "/path/to/book1.pdf",
+            "image_path": "images\\CHUONG.PNG",
+            "description": "Đây là một cuốn tiểu thuyết hấp dẫn về một nhân vật chính đi tìm cuộc sống ý nghĩa."
+        },
+        {
+            "title": "Sách học 1",
+            "author": "Tác giả B",
+            "genre": "Sách giáo trình",
+            "year": 2000,
+            "pages": 500,
+            "file_path": "/path/to/book2.pdf",
+            "image_path": "images\\CHUONG.PNG",
+            "description": "Cuốn sách giáo trình này cung cấp kiến thức về lập trình Python từ cơ bản đến nâng cao."
+        }
+    ]
+}

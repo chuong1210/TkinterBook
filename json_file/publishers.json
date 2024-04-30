@@ -1,0 +1,32 @@
+{
+    "publishers": [
+        {
+            "id": "pub01",
+            "name": "Nhà xuất bản Kim Đồng",
+            "location": "Hà Nội",
+            "founded_year": 1957,
+            "website": "https://nxbkimdong.com.vn"
+        },
+        {
+            "id": "pub02",
+            "name": "Nhà xuất bản Văn học",
+            "location": "Hà Nội",
+            "founded_year": 1957,
+            "website": "https://nxbvanhoc.vn"
+        },
+        {
+            "id": "pub03",
+            "name": "Nhà xuất bản Trẻ",
+            "location": "Thành phố Hồ Chí Minh",
+            "founded_year": 1986,
+            "website": "https://nxbtre.com.vn"
+        },
+        {
+            "id": "pub04",
+            "name": "Nhà xuất bản Thời Đại",
+            "location": "Hà Nội",
+            "founded_year": 1981,
+            "website": "https://nxbthoigian.vn"
+        }
+    ]
+}

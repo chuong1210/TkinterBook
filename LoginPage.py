@@ -17,11 +17,11 @@ class LoginPage:
             if user_info['username'] == entered_username and user_info['password'] == entered_password:
                 if user_info['type'] == 'admin':
                     new_window = Toplevel(self.window)
-                    run_admin( new_window)
+                    run_admin( new_window,user_info)
                     self.window.withdraw() 
                 elif user_info['type'] == 'user':
                     new_window = Toplevel(self.window)
-                    run_user( new_window)
+                    run_user( new_window,user_info)
                     self.window.withdraw() 
                 else:
                     print("Unknown user type.")
@@ -35,7 +35,8 @@ class LoginPage:
         self.window.geometry('965x606+50+50')
         self.window.resizable(0, 0)
         self.window.state('zoomed')
-        self.window.title('Login Page')
+        self.window.title('Trang đăng nhập')
+        self.window.iconbitmap('images//changepw.ico')
 
         # ========================================================================
         # ============================background image============================
@@ -139,7 +140,7 @@ class LoginPage:
         # ========================================================================
        
         self.login = Button(self.lgn_frame, text='Đăng nhập', command=self.login_function ,font=("times new roman", 14, "bold"), width=25, bd=0,
-                            bg='#3047ff', cursor='hand2', activebackground='#3047ff', fg='white')
+                            bg='#3047ff', cursor='hand2', activebackground='#8865ff', fg='white')
         self.login.place(x=580, y=450)
         self.error_message_label = Label(self.lgn_frame, text='', bg="#1974d3")
         self.error_message_label.place(x=580, y=427)
