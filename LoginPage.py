@@ -1,9 +1,9 @@
 from tkinter import *
 from PIL import ImageTk, Image,ImageDraw
 import json
-from user import admin
-from user.user import run_user
-from user.admin import run_admin
+from page import admin
+from page.user import run_user
+from page.admin import run_admin
 from support_app import destroy_window
 with open('json_file\\users_login.json') as f:
     user_data = json.load(f)
@@ -32,6 +32,7 @@ class LoginPage:
 
     def __init__(self, window):
         self.window = window
+        
         self.window.geometry('965x606+50+50')
         self.window.resizable(0, 0)
         self.window.state('zoomed')
@@ -55,11 +56,11 @@ class LoginPage:
         # ========================================================
         # ========================================================================
         self.txt = "Chào mừng độc giả"
-        self.heading = Label(self.lgn_frame, text=self.txt, font=('times new roman', 25, "bold"), bg="#1974d3",
+        self.heading = Label(self.lgn_frame, text=self.txt, font=('Roboto', 25, "bold"), bg="#1974d3",
                              fg='white',
                              bd=5,
                              relief=FLAT)
-        self.heading.place(x=340, y=30, width=300, height=50)
+        self.heading.place(x=340, y=30, width=310, height=50)
 
         # ========================================================================
         # ============ Left Side Image ================================================
@@ -112,18 +113,18 @@ class LoginPage:
         # ============ Sign In label =============================================
         # ========================================================================
         self.sign_in_label = Label(self.lgn_frame, text="Sign In", bg="#1974d3", fg="white",
-                                    font=("times new roman", 17, "bold"))
+                                    font=("Roboto", 17, "bold"))
         self.sign_in_label.place(x=650, y=240)
 
         # ========================================================================
         # ============================username====================================
         # ========================================================================
         self.username_label = Label(self.lgn_frame, text="Username", bg="#1974d3", fg="#4f4e4d",
-                                    font=("times new roman", 13, "bold"))
+                                    font=("Roboto", 13, "bold"))
         self.username_label.place(x=550, y=300)
 
         self.username_entry = Entry(self.lgn_frame, highlightthickness=0, relief=FLAT, bg="#1974d3", fg="#6b6a69",
-                                    font=("times new roman ", 12, "bold"), insertbackground = '#6b6a69')
+                                    font=("Roboto ", 12, "bold"), insertbackground = '#6b6a69')
         self.username_entry.place(x=580, y=335, width=270)
 
         self.username_line = Canvas(self.lgn_frame, width=300, height=2.0, bg="#ffcc98", highlightthickness=0)
@@ -139,7 +140,7 @@ class LoginPage:
         # ============================login button================================
         # ========================================================================
        
-        self.login = Button(self.lgn_frame, text='Đăng nhập', command=self.login_function ,font=("times new roman", 14, "bold"), width=25, bd=0,
+        self.login = Button(self.lgn_frame, text='Đăng nhập', command=self.login_function ,font=("Roboto", 14, "bold"), width=25, bd=0,
                             bg='#3047ff', cursor='hand2', activebackground='#8865ff', fg='white')
         self.login.place(x=580, y=450)
         self.error_message_label = Label(self.lgn_frame, text='', bg="#1974d3")
@@ -149,11 +150,11 @@ class LoginPage:
         # ============================password====================================
         # ========================================================================
         self.password_label = Label(self.lgn_frame, text="Password", bg="#1974d3", fg="#4f4e4d",
-                                    font=("times new roman", 13, "bold"))
+                                    font=("Roboto", 13, "bold"))
         self.password_label.place(x=550, y=363)
 
         self.password_entry = Entry(self.lgn_frame, highlightthickness=0, relief=FLAT, bg="#1974d3", fg="#6b6a69",
-                                    font=("times new roman", 12, "bold"), show="*", insertbackground = '#6b6a69')
+                                    font=("Roboto", 12, "bold"), show="*", insertbackground = '#6b6a69')
         self.password_entry.config(disabledbackground="#ffffff")
         self.password_entry.place(x=580, y=390, width=244)
         
@@ -199,6 +200,10 @@ class LoginPage:
         self.password_entry.config(show=self.show_password.get())
 def page():
     window = Tk()
+    import tkinter as tk
+
+    window.overrideredirect(1) # Root window sẽ không có thanh tiêu đề và viền
+
     LoginPage(window)
     window.mainloop()
 
