@@ -55,21 +55,22 @@ class Manage:
                 # =================== HOME PAGE ========================================================
                 # ======================================================================================
 
-                product_page.grid_rowconfigure(0, weight=1)
-                product_page.grid_columnconfigure(0, weight=1)                
+                product_page.grid_rowconfigure(0, weight=1)  # Hàng 0 (chứa cả hai khung)
+                product_page.grid_columnconfigure(0, weight=1)  # Cột 0 (chứa coverFrame2)
+                product_page.grid_columnconfigure(1, weight=4)  # Cột 1 (chứa coverFrame)              
                 coverFrame = Frame(product_page, bg='#ffffff')
+                coverFrame.grid(row=0, column=1, sticky="nsew", padx=20, pady=20)
                 
 
                 topFrame = LabelFrame(coverFrame, bg='#f1f1f1', bd='2.4')
-                topFrame.place(x=53, y=106, width=897, height=40)
-                
-                coverFrame_line = Canvas(coverFrame, width=1055, height=1.5, bg="#108cff", highlightthickness=0)
-                coverFrame_line.place(x=0, y=130)
+                topFrame.grid(row=1, column=0, sticky="nsew", padx=20, pady=20)                
+                # coverFrame_line = Canvas(coverFrame, width=1055, height=1.5, bg="#108cff", highlightthickness=0)
+                # coverFrame_line.grid(row=0, column=0, sticky="nsew", padx=20, pady=20)
 
 
 
                 coverFrame2 = Frame(product_page, bg='#ffffff')
-                coverFrame2.place(x=0, y=0, width=290, height=830)
+                coverFrame2.grid(row=0, column=0, sticky="nsew", padx=0, pady=0)
 
 
             

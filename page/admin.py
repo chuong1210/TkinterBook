@@ -1,11 +1,13 @@
 
 from tkinter import *
 from tkinter import messagebox
+from tkinter import ttk
 from PIL import ImageTk, Image,ImageDraw
 import json
 import requests
 from io import BytesIO
-from book_detail import BookDetailWindow
+from .book_detail import BookDetailWindow
+from .manage_table import ManageTable
 import threading
 from time import sleep
 colorBg="f0f8ff"
@@ -23,6 +25,7 @@ class adminPage:
         self.create_sidebar()
         self.create_header_line()
 
+
         self.create_main_content()
         self.current_user = user_info
         self.window.grid_rowconfigure(0, weight=0)  # Header không nên mở rộng khi cửa sổ được chỉnh kích thước
@@ -30,6 +33,12 @@ class adminPage:
         self.window.grid_columnconfigure(0, weight=0)  # Sidebar không nên mở rộng
         self.window.grid_columnconfigure(1, weight=1)  # Main frame nên mở rộng
         self.images = []
+    
+    def exit(self):
+        exit_command = messagebox.askyesno("Xác nhận","Bạn có muốn đăng xuất không")
+        messagebox.CANCEL
+        if exit_command > 0:
+            self.window.destroy()
 
     def create_sidebar(self):
         sidebar_frame = Frame(self.window, width=200, bg='#108690')
@@ -104,18 +113,25 @@ class adminPage:
                                command=lambda: self.threaded_function(book_search_entry))
         search_button.pack(side='left', padx=10)
         
-        self.button6 = Button(header_frame)
-        self.button6.place(relx=0.762, rely=0.022, width=86, height=25)
-        self.button6.configure(relief="flat")
-        self.button6.configure(overrelief="flat")
-        self.button6.configure(activebackground="#4cb5f5")
-        self.button6.configure(cursor="hand2")
-        self.button6.configure(foreground="#ffffff")
-        self.button6.configure(background="#4cb5f5")
-        self.button6.configure(font="-family {Poppins SemiBold} -size 10")
-        self.button6.configure(borderwidth="0")
-        self.button6.configure(text="""Exit""")
-        self.button6.configure(command=exit)
+        # self.button6 = Button(header_frame)
+        # self.button6.place(relx=0.762, rely=0.300, width=96, height=45)
+        # self.button6.configure(relief="flat")
+        # self.button6.configure(overrelief="flat")
+        # self.button6.configure(activebackground="#4cb5f5")
+        # self.button6.configure(cursor="hand2")
+        # self.button6.configure(foreground="#ffffff")
+        # self.button6.configure(background="#4cb5f5")
+        # self.button6.configure(font="-family {Poppins SemiBold} -size 10")
+        # self.button6.configure(borderwidth="0")
+        # self.button6.configure(text="""Đăng xuất""")
+        # self.button6.configure(command=self.exit)
+
+                       # ========== LOG OUT =======
+        logout_button = Button(header_frame, text='Logout', bg='#4cb5f5', font=("Poppins SemiBold", 13, "bold"), bd=0,
+                                            fg='#fff',
+                                        cursor='hand2', activebackground='#4cb5f5', activeforeground='#ffffff',
+                                       command=self.exit)
+        logout_button.place(relx=0.362, rely=0.300, width=96, height=45)
 
 
     def view_account_info(self):
@@ -167,9 +183,6 @@ class adminPage:
         self.clear_main_content()
         Label(self.main_frame, text="Đây là trang chính cho admin", font=("Helvetica", 40),relief='ridge').pack(expand=True)
 
-    def manage_users(self):
-        self.clear_main_content()
-        Label(self.main_frame, text="Trang quản lý người dùng", font=("Helvetica", 40)).pack(expand=True)
 
     def manage_options(self):
         self.clear_main_content()
@@ -198,12 +211,16 @@ class adminPage:
 
         # book_picture = PhotoImage(file="images\\book.png")
         # book_picture = book_picture.subsample(3, 3)  # giảm kích thước hình ảnh
-    def manage_books(self):
-        self.clear_main_content()
-        Label(self.main_frame, text="Trang quản lý sách", font=("Helvetica", 40)).pack(expand=True)
-    def manage_publishers(self):
-        self.clear_main_content()
-        Label(self.main_frame, text="Trang quản lý nhà xuất bản", font=("Helvetica", 40)).pack(expand=True)
+        
+    # def manage_users(self):
+    #     self.clear_main_content()
+    #     Label(self.main_frame, text="Trang quản lý người dùng", font=("Helvetica", 40)).pack(expand=True)
+    # def manage_books(self):
+    #     self.clear_main_content()
+    #     Label(self.main_frame, text="Trang quản lý sách", font=("Helvetica", 40)).pack(expand=True)
+    # def manage_publishers(self):
+    #     self.clear_main_content()
+    #     Label(self.main_frame, text="Trang quản lý nhà xuất bản", font=("Helvetica", 40)).pack(expand=True)
 
 
     def clear_main_content(self):
@@ -386,10 +403,43 @@ class adminPage:
 #                                        command=logout)
 # logout_button.place(x=420, y=15)
 
-    def exit(self):
-        exit_command = messagebox.askyesno("Are you want to exit")
-        if exit_command > 0:
-            self.master.destroy()
+    def manage_users(self):
+        self.clear_main_content()
+        user_columns = ("username", "password","type")
+        self.user_table = ManageTable(self.main_frame, "json_file\\users_login.json", "users", user_columns,"Độc gia")
+        intermediate_frame = Frame(self.main_frame)
+        intermediate_frame.pack(fill=BOTH, expand=True)
+
+    # Đặt các frame con vào frame trung gian
+        self.book_table.table_frame.pack(side=LEFT, fill=BOTH, expand=True)
+        self.book_table.edit_card_frame.pack(side=LEFT, fill=Y)
+
+    def manage_books(self):
+        self.clear_main_content()
+        book_columns = ("title", "author", "genre", "year", "pages")
+        self.book_table = ManageTable(self.main_frame, "json_file\\books_detail.json", "books", book_columns,"Sách")
+        # self.book_table.create_edit_card()
+
+        intermediate_frame = Frame(self.main_frame)
+        intermediate_frame.pack(fill=BOTH, expand=True)
+
+    # Đặt các frame con vào frame trung gian
+        self.book_table.table_frame.pack(side=RIGHT, fill=BOTH, expand=True)
+        self.book_table.edit_card_frame.pack(side=LEFT, fill=Y)
+        
+
+    def manage_publishers(self):
+        self.clear_main_content()
+        publishers_columns = ("Pid", "name", "location", "founded_year", "website")
+        self.publishers_table = ManageTable(self.main_frame, "json_file\\publishers.json", "publishers", publishers_columns,"Sách")
+        # self.publishers_table.create_edit_card()
+
+        intermediate_frame = Frame(self.main_frame)
+        intermediate_frame.pack(fill=BOTH, expand=True)
+
+    # Đặt các frame con vào frame trung gian
+        self.publishers_table.table_frame.pack(side=LEFT, fill=BOTH, expand=True)
+        self.publishers_table.edit_card_frame.pack(side=LEFT, fill=Y)        # Tương tự như manage_books, nhưng với file và data_key khác
 
  
 def run_admin(window,user_info):
