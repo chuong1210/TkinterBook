@@ -73,3 +73,6 @@ cover_canvas.create_window((0, 0), window=cover_frame, anchor="nw")
 window.bind("<Configure>", lambda e: cover_canvas.configure(scrollregion=cover_canvas.bbox("all")))
 
 window.mainloop()
+
+
+
