@@ -6,8 +6,8 @@ from PIL import ImageTk, Image,ImageDraw
 import json
 import requests
 from io import BytesIO
-from .book_detail import BookDetailWindow
-from .manage_table import ManageTable
+from book_detail import BookDetailWindow
+from manage_table import ManageTable
 import threading
 from time import sleep
 colorBg="f0f8ff"
@@ -410,9 +410,9 @@ class adminPage:
         intermediate_frame = Frame(self.main_frame)
         intermediate_frame.pack(fill=BOTH, expand=True)
 
-    # Đặt các frame con vào frame trung gian
-        self.book_table.table_frame.pack(side=LEFT, fill=BOTH, expand=True)
-        self.book_table.edit_card_frame.pack(side=LEFT, fill=Y)
+        # Corrected lines: replaced `book_table` with `user_table` here
+        self.user_table.table_frame.pack(side=LEFT, fill=BOTH, expand=True)
+        self.user_table.edit_card_frame.pack(side=LEFT, fill=Y)
 
     def manage_books(self):
         self.clear_main_content()

@@ -135,12 +135,10 @@ class ManageTable:
 
 
         del self.data[self.selected_index]
-        print("aasa")
         self.selected_index = None 
 
 
         self.save_data()
-        print("ko")
 
         self.populate_table()  # Refresh the Treeview
 
@@ -150,15 +148,15 @@ class ManageTable:
 
             self.selected_index = None  # Reset index
         if children:
-            print(123,"childre")
-            next_iid = self.table.next(selected_iid)
-            if next_iid:
-                self.table.selection_set(next_iid)
-                self.selected_index = self.table.index(next_iid)
-            else:
-                # Select the first row (if any)
-                self.table.selection_set(children[0])
-                self.selected_index = 0
+            try:
+                next_iid = self.table.next(selected_iid)
+                # Select the next item if it exists
+                if next_iid:
+                    self.table.selection_set(next_iid)
+                    self.selected_index = self.table.index(next_iid)
+            except TclError:
+                # Handle case when there are no more items after the deleted one
+                self.selected_index = None
             # Handle empty table case (e.g., reset index or display message)
         # Option 2: Reset index (if you don't need to maintain selection)
         # self.selected_index = None
@@ -232,18 +230,46 @@ class ManageTable:
         self.button6.configure(text="""Clear""")
         self.button6.configure(command=self.clear_edit_card)
     
+    # def save_data(self):
+        
+    #     if self.selected_index is None:
+    #         print(self.data,"data")
+    #         with open(self.data_file, 'w', encoding='utf-8') as f:
+    #             json.dump({self.data_key: self.data}, f)
+
+
+    #         self.populate_table()
+    #         self.clear_edit_card()
+
+    #         return
+
+    #     new_data = [entry.get() for entry in self.entries]
+        
+    #     print(self.selected_index,"index")
+    #     self.data[self.selected_index] = dict(zip(self.columns, new_data))
+    #     print(self.data,"data")
+
+    #     with open(self.data_file, 'w', encoding='utf-8') as f:
+    #         json.dump({self.data_key: self.data}, f)
+
+
+    #     self.populate_table()
+    #     self.clear_edit_card()
     def save_data(self):
-        if self.selected_index is None:
-            return
-
-        new_data = [entry.get() for entry in self.entries]
-        self.data[self.selected_index] = dict(zip(self.columns, new_data))
-
+        # Always write the current state of data to file, regardless of whether it's an update or delete
         with open(self.data_file, 'w', encoding='utf-8') as f:
             json.dump({self.data_key: self.data}, f)
+        
+        # If an update is performed, retrieve the updated data and apply it
+        if self.selected_index is not None:
+            updated_data = [entry.get() for entry in self.entries]
+            self.data[self.selected_index] = dict(zip(self.columns, updated_data))
+            
+            # After updating the internal data structure, save to file to persist changes
+            with open(self.data_file, 'w', encoding='utf-8') as f:
+                json.dump({self.data_key: self.data}, f)
 
-
+        # Refresh the view to reflect changes
         self.populate_table()
         self.clear_edit_card()
-
 # Liên kết sự kiện click vào dòng
