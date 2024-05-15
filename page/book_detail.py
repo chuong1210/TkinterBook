@@ -8,6 +8,7 @@ import threading
 from time import sleep
 class BookDetailWindow:
     def __init__(self, master, book_info):
+        print(book_info)
         self.window = Toplevel(master) # Tạo một cửa sổ top-level mới
         self.window.title('Thông tin chi tiết sách')
 
@@ -25,3 +26,4 @@ class BookDetailWindow:
             cover_label.pack()
 
         self.window.mainloop()
+        

@@ -10,6 +10,7 @@ from book_detail import BookDetailWindow
 from manage_table import ManageTable
 import threading
 from time import sleep
+from tkinter import filedialog
 colorBg="f0f8ff"
 with open('json_file\\users_login.json') as f:
     user_data = json.load(f)
@@ -25,6 +26,7 @@ class adminPage:
         self.create_sidebar()
         self.create_header_line()
 
+        self.main_frame = None
 
         self.create_main_content()
         self.current_user = user_info
@@ -131,8 +133,7 @@ class adminPage:
                                             fg='#fff',
                                         cursor='hand2', activebackground='#4cb5f5', activeforeground='#ffffff',
                                        command=self.exit)
-        logout_button.place(relx=0.362, rely=0.300, width=96, height=45)
-
+        logout_button.place(relx=0.82, rely=0.300, width=96, height=45)
 
     def view_account_info(self):
     # Code to view account info goes here
@@ -163,16 +164,22 @@ class adminPage:
         settings_button.pack(pady=10,padx=10)
 
     def create_main_content(self):
-        self.main_frame = Frame(self.window)
+        if self.main_frame is not None and self.main_frame.winfo_exists():
+            # Hủy bỏ nội dung cũ
+            for widget in self.main_frame.winfo_children():
+                widget.destroy()
+        else:
+            # Tạo main_frame mới nếu cần
+            self.main_frame = Frame(self.window)
         self.main_frame.place(relx=0.093, rely=0.12, relwidth=0.912, relheight=0.845) 
 
-    # creating background image widget
+        # creating background image widget
         self.bg_image = Image.open('images\\bgmain.jpg')
         self.bg_photo_image = ImageTk.PhotoImage(self.bg_image)
         self.bg_label = Label(self.main_frame, image=self.bg_photo_image)
         self.bg_label.place(x=0, y=0, relwidth=0.99, relheight=0.845)
-    
-    # creating overlying label widget
+        
+        # creating overlying label widget
         self.home_label = Label(self.main_frame, text="Đây là trang admin", font=("Helvetica", 40), fg='#000')
         self.home_label.place(relx=0.5, rely=0.5, anchor='center') 
         self.display_all_books_json()
@@ -413,12 +420,19 @@ class adminPage:
         # Corrected lines: replaced `book_table` with `user_table` here
         self.user_table.table_frame.pack(side=LEFT, fill=BOTH, expand=True)
         self.user_table.edit_card_frame.pack(side=LEFT, fill=Y)
+    def select_image():
+        file_path = filedialog.askopenfilename(initialdir="/", title="Select file",
+                                            filetypes=(("jpeg files", "*.jpg"),
+                                                        ("all files", "*.*")))
+        if file_path:
+            # Do something with the selected file path
+            print(file_path)
 
     def manage_books(self):
         self.clear_main_content()
-        book_columns = ("title", "author", "genre", "year", "pages")
-        self.book_table = ManageTable(self.main_frame, "json_file\\books_detail.json", "books", book_columns,"Sách")
-        # self.book_table.create_edit_card()
+        book_columns = ("title", "author", "genre", "year", "pages","image_path")
+        self.book_table = ManageTable(self.main_frame, "json_file\\books_detail.json", "books", book_columns,"Sách",allow_images=True)
+
 
         intermediate_frame = Frame(self.main_frame)
         intermediate_frame.pack(fill=BOTH, expand=True)
@@ -445,7 +459,6 @@ class adminPage:
 def run_admin(window,user_info):
    # window = Tk()
     adminPage(window,user_info)
-
 
 def page():
     window = Tk()
