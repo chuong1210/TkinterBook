@@ -1,63 +1,43 @@
+from selenium import webdriver
+from selenium.webdriver.chrome.service import Service
+from selenium.webdriver.common.by import By
+from bs4 import BeautifulSoup
 
-import tkinter as tk
-from tkinter import messagebox, simpledialog
-import requests
-from tkinter import ttk
+def fetch_data():
+    # Lấy URL từ ô nhập liệu
+    url="https://nhasachmienphi.com/doc-online/bach-da-hanh-311518"
 
-# Định nghĩa hàm để lấy dữ liệu từ Google Books API
-def fetch_books(id):
+    # Khởi tạo trình điều khiển Chrome
+    service = Service(executable_path='path/to/chromedriver') # Thay thế bằng đường dẫn tới chromedriver của bạn
+    driver = webdriver.Chrome(service=service)
+
     try:
-        # Gửi yêu cầu GET đến Google Books API
-        response = requests.get(f"https://project-gutenberg-api.p.rapidapi.com/books/{id}")
-        response.raise_for_status()
-        data = response.json()
+        # Truy cập trang web
+        driver.get(url)
+
+        # Chờ cho JavaScript chạy hoàn tất (nếu cần)
+        driver.implicitly_wait(10)  # Chờ tối đa 10 giây
+
+        # Lấy HTML đầy đủ
+        html = driver.page_source
+
+        # Phân tích HTML
+        soup = BeautifulSoup(html, 'html.parser')
+
+        # Tìm thẻ div có class 'content_p_al'
+        content_div = soup.find('div', class_='content_p_al')
         
-        if "items" in data:
-            books = data["items"]
-            return books
-        else:
-            return []  
-        
-    except requests.RequestException as e:
-        messagebox.showerror("Error", str(e))
+        # Tìm thẻ div có class 'chapter-c' bên trong content_div
+        chapter_div = content_div.find('div', class_='chapter-c')
 
-# Chức năng hiển thị sách trên giao diện
-def show_books():
-    global books_info
-    title = search_entry.get()
-    if title:
-        books_info = fetch_books(title)
-        listbox.delete(0, tk.END)
-        for book in books_info:
-            listbox.insert(tk.END, book['volumeInfo'].get('title', 'No Title'))
+        # Tìm tất cả thẻ p trong thẻ div có class 'chapter-c'
+        paragraphs = chapter_div.find_all('p')
+        for paragraph in paragraphs:
+            if paragraph.text.strip():
+                print(paragraph.text)  # In nội dung của thẻ p
 
-# Hàm để hiển thị nội dung chi tiết của sách được chọn
-def show_book_detail(event):
-    # Lấy index của sách được chọn
-    try:
-        index = listbox.curselection()[0]
-        book = books_info[index]
-        
-        book_details = f"Title: {book['volumeInfo'].get('title', 'No Title')}"
-        book_details += f"\nAuthors: {', '.join(book['volumeInfo'].get('authors', []))}"
-        book_details += f"\nPublished Date: {book['volumeInfo'].get('publishedDate', 'Unknown')}"
-        
-        messagebox.showinfo("Book Details", book_details)
-    except IndexError:
-        messagebox.showwarning("Warning", "Please select a book from the list")
+    finally:
+        # Đóng trình duyệt
+        driver.quit()
 
-# Khởi tạo giao diện Tkinter
-root = tk.Tk()
-root.title("Book Finder")
-
-search_entry = tk.Entry(root, width=50)
-search_entry.pack()
-
-search_button = tk.Button(root, text="Search", command=show_books)
-search_button.pack()
-
-listbox = tk.Listbox(root, width=80, height=20)
-listbox.pack()
-listbox.bind('<<ListboxSelect>>', show_book_detail)
-
-root.mainloop()
+fetch_data()

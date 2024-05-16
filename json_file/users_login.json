@@ -1,1 +1,1 @@
-{"users": [{"username": "user1", "password": "password1", "type": "admin"}, {"username": "2", "password": "2", "type": "user"}, {"username": "user3", "password": "password3", "type": "user"}, {"username": "user3", "password": "pass", "type": "user"}]}
+{"users": [{"username": "user1", "password": "password1", "type": "admin"}, {"username": "2", "password": "2", "type": "user"}, {"username": "user3", "password": "password3", "type": "user"}, {"username": "user1", "password": "password1", "type": "admin"}]}

@@ -327,7 +327,7 @@ class adminPage:
                         img = ImageTk.PhotoImage(Image.open(BytesIO(img_data)))
                     
                         cover_label = Label(book_frame, image=img,cursor='hand2')
-                        cover_label.bind("<Button-1>", lambda e: BookDetailWindow(self.window, book_info))
+                        cover_label.bind("<Button-1>", lambda e: self.show_book_detail(book_info,isOwner='api'))
                         cover_label.image = img
                         cover_label.pack()
                         title = book_info['title']
@@ -347,8 +347,17 @@ class adminPage:
                         pass
             else:
                  self.display_all_books_json()
+
+    def show_book_content(self, book_info):
+        self.clear_main_content()
+        title_label = Label(self.main_frame, text=book_info['title'], font=("Helvetica", 16))
+        title_label.pack()
+        # Tiếp theo là hiển thị nội dung của sách theo book_info['content'] hoặc tương tự
+        content_label = Label(self.main_frame, text=book_info['description'], wraplength=self.main_frame.winfo_width())
+        content_label.pack()
     def display_all_books_json(self):
     # Đọc file JSON
+    
         with open('json_file\\books_detail.json', 'r', encoding='utf-8') as f:
             data = json.load(f)
     
@@ -385,12 +394,14 @@ class adminPage:
                 cover_label = Label(book_frame, image=photoImg,cursor='hand2')
                 cover_label.image = photoImg  # Lưu hình ảnh để tránh bị Python hủy
                 cover_label.pack()
+                cover_label.bind("<Button-1>", lambda e, book=book: self.show_book_detail(book,isOwner='json'))
+
 
     # Hiển thị thông tin sách
             title = book['title']
             if len(title) > 40:  # Cắt tiêu đề nếu quá dài
                 title = title[:37] + "..."
-            author = book['author']
+            author = book['authors']
             info_label = Label(book_frame, text=f"{title}\nAuthor: {author}", justify=LEFT)
 
             info_label.pack()
@@ -410,6 +421,8 @@ class adminPage:
 #                                        command=logout)
 # logout_button.place(x=420, y=15)
 
+    def show_book_detail(self, book,isOwner):
+        BookDetailWindow(self.window, book,isOwner, self.show_book_content)
     def manage_users(self):
         self.clear_main_content()
         user_columns = ("username", "password","type")
@@ -430,7 +443,7 @@ class adminPage:
 
     def manage_books(self):
         self.clear_main_content()
-        book_columns = ("title", "author", "genre", "year", "pages","image_path")
+        book_columns = ("title", "authors", "genre", "year", "pages","image_path")
         self.book_table = ManageTable(self.main_frame, "json_file\\books_detail.json", "books", book_columns,"Sách",allow_images=True)
 
 
