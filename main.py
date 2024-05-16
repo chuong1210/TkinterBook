@@ -1,63 +1,78 @@
+#importing library
+from tkinter import *
+from tkinter import font
+from PIL import ImageTk, Image 
+from LoginPage import page
 
-import tkinter as tk
-from tkinter import messagebox, simpledialog
-import requests
-from tkinter import ttk
+import time
 
-# Định nghĩa hàm để lấy dữ liệu từ Google Books API
-def fetch_books(id):
-    try:
-        # Gửi yêu cầu GET đến Google Books API
-        response = requests.get(f"https://project-gutenberg-api.p.rapidapi.com/books/{id}")
-        response.raise_for_status()
-        data = response.json()
-        
-        if "items" in data:
-            books = data["items"]
-            return books
-        else:
-            return []  
-        
-    except requests.RequestException as e:
-        messagebox.showerror("Error", str(e))
+w=Tk()
 
-# Chức năng hiển thị sách trên giao diện
-def show_books():
-    global books_info
-    title = search_entry.get()
-    if title:
-        books_info = fetch_books(title)
-        listbox.delete(0, tk.END)
-        for book in books_info:
-            listbox.insert(tk.END, book['volumeInfo'].get('title', 'No Title'))
+#Using piece of code from old splash screen
+width_of_window = 427
+height_of_window = 250
+screen_width = w.winfo_screenwidth()
+screen_height = w.winfo_screenheight()
+x_coordinate = (screen_width/2)-(width_of_window/2)
+y_coordinate = (screen_height/2)-(height_of_window/2)
+w.geometry("%dx%d+%d+%d" %(width_of_window,height_of_window,x_coordinate,y_coordinate))
+#w.configure(bg='#ED1B76')
+w.overrideredirect(1) #for hiding titlebar
 
-# Hàm để hiển thị nội dung chi tiết của sách được chọn
-def show_book_detail(event):
-    # Lấy index của sách được chọn
-    try:
-        index = listbox.curselection()[0]
-        book = books_info[index]
-        
-        book_details = f"Title: {book['volumeInfo'].get('title', 'No Title')}"
-        book_details += f"\nAuthors: {', '.join(book['volumeInfo'].get('authors', []))}"
-        book_details += f"\nPublished Date: {book['volumeInfo'].get('publishedDate', 'Unknown')}"
-        
-        messagebox.showinfo("Book Details", book_details)
-    except IndexError:
-        messagebox.showwarning("Warning", "Please select a book from the list")
+#new window to open
+def new_win():
+    q=Tk()
+    q.title('main window')
+    q.mainloop()
 
-# Khởi tạo giao diện Tkinter
-root = tk.Tk()
-root.title("Book Finder")
+Frame(w, width=427, height=250, bg='#272727').place(x=0,y=0)
+name_thesis=Label(w, text='PROGRAMMED', fg='white', bg='#272727') #decorate it 
+name_thesis.configure(font=("Game Of Squids", 24, "bold"))   #You need to install this font in your PC or try another one
+name_thesis.place(x=80,y=90)
 
-search_entry = tk.Entry(root, width=50)
-search_entry.pack()
+Loading_lb=Label(w, text='Loading...', fg='white', bg='#272727') #decorate it 
+Loading_lb.configure(font=("Calibri", 11))
+Loading_lb.place(x=10,y=215)
 
-search_button = tk.Button(root, text="Search", command=show_books)
-search_button.pack()
+#making animation
 
-listbox = tk.Listbox(root, width=80, height=20)
-listbox.pack()
-listbox.bind('<<ListboxSelect>>', show_book_detail)
+img_load1=ImageTk.PhotoImage(Image.open('images\\c2.png'))
+img_load2=ImageTk.PhotoImage(Image.open('images\\c1.png'))
 
-root.mainloop()
+
+
+
+for i in range(5): #5loops
+    l1=Label(w, image=img_load1, border=0, relief=SUNKEN).place(x=180, y=145)
+    l2=Label(w, image=img_load2, border=0, relief=SUNKEN).place(x=200, y=145)
+    l3=Label(w, image=img_load2, border=0, relief=SUNKEN).place(x=220, y=145)
+    l4=Label(w, image=img_load2, border=0, relief=SUNKEN).place(x=240, y=145)
+    w.update_idletasks()
+    time.sleep(0.5)
+
+    l1=Label(w, image=img_load2, border=0, relief=SUNKEN).place(x=180, y=145)
+    l2=Label(w, image=img_load1, border=0, relief=SUNKEN).place(x=200, y=145)
+    l3=Label(w, image=img_load2, border=0, relief=SUNKEN).place(x=220, y=145)
+    l4=Label(w, image=img_load2, border=0, relief=SUNKEN).place(x=240, y=145)
+    w.update_idletasks()
+    time.sleep(0.5)
+
+    l1=Label(w, image=img_load2, border=0, relief=SUNKEN).place(x=180, y=145)
+    l2=Label(w, image=img_load2, border=0, relief=SUNKEN).place(x=200, y=145)
+    l3=Label(w, image=img_load1, border=0, relief=SUNKEN).place(x=220, y=145)
+    l4=Label(w, image=img_load2, border=0, relief=SUNKEN).place(x=240, y=145)
+    w.update_idletasks()
+    time.sleep(0.5)
+
+    l1=Label(w, image=img_load2, border=0, relief=SUNKEN).place(x=180, y=145)
+    l2=Label(w, image=img_load2, border=0, relief=SUNKEN).place(x=200, y=145)
+    l3=Label(w, image=img_load2, border=0, relief=SUNKEN).place(x=220, y=145)
+    l4=Label(w, image=img_load1, border=0, relief=SUNKEN).place(x=240, y=145)
+    w.update_idletasks()
+    time.sleep(0.5)
+
+
+
+w.destroy()
+page()
+w.mainloop()

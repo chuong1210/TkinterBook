@@ -232,19 +232,21 @@ class ManageTable:
             # Handle empty table case (e.g., reset index or display message)
         # Option 2: Reset index (if you don't need to maintain selection)
         # self.selected_index = None
-        
+ 
     def create_edit_card(self):
         # self.edit_card_frame = Frame(self.master, bd=1, relief="solid")
         # self.edit_card_frame.pack(padx=20, pady=20)
         # Các label và entry cho từng trường thông tin
-        yCard=0.249
+        # self.edit_card_frame.grid_propagate(False) 
+
+        # self.edit_card_frame.config(width=250, height=200)
         self.labels = []
         self.entries = []
         for i, col in enumerate(self.columns):
-            label = Label(self.edit_card_frame, text=col)
+            label = Label(self.edit_card_frame, text=col,font=23,foreground="#6699CC",background="#696969")
             label.grid(row=i, column=0, padx=5, pady=5, sticky="w") # Align label to the west
             self.labels.append(label)
-            entry = Entry(self.edit_card_frame)
+            entry = Entry(self.edit_card_frame,highlightthickness=2, relief=FLAT, fg="#6b6a69",insertbackground = '#6b6a69')
             entry.grid(row=i, column=1, padx=5, pady=5)
             self.entries.append(entry)
 
@@ -263,22 +265,22 @@ class ManageTable:
         # Action buttons
         self.button4 = Button(self.edit_card_frame, text="Add", command=self.add_record,
                               bg='#4cb5f5', font=("Poppins SemiBold", 10, "bold"), bd=0,
-                              fg='#fff', cursor='hand2', activebackground='#4cb5f5', activeforeground='#ffffff')
+                              fg='#fff', cursor='hand2', activebackground='#4cb5f5', activeforeground='#ffffff',  width=10, height=2)
         self.button4.grid(row=len(self.columns)+2, column=0, padx=5, pady=5, sticky="ew")
 
         self.button3 = Button(self.edit_card_frame, text="Delete", command=self.delete_record,
                               bg='#4cb5f5', font=("Poppins SemiBold", 10, "bold"), bd=0,
-                              fg='#fff', cursor='hand2', activebackground='#4cb5f5', activeforeground='#ffffff')
+                              fg='#fff', cursor='hand2', activebackground='#4cb5f5', activeforeground='#ffffff',  width=10, height=2)
         self.button3.grid(row=len(self.columns)+2, column=1, padx=5, pady=5, sticky="ew")
 
         self.button5 = Button(self.edit_card_frame, text="Update", command=self.update_record,
                               bg='#4cb5f5', font=("Poppins SemiBold", 10, "bold"), bd=0,
-                              fg='#fff', cursor='hand2', activebackground='#4cb5f5', activeforeground='#ffffff')
+                              fg='#fff', cursor='hand2', activebackground='#4cb5f5', activeforeground='#ffffff',  width=10, height=2)
         self.button5.grid(row=len(self.columns)+3, column=0, padx=5, pady=5, sticky="ew")
 
         self.button6 = Button(self.edit_card_frame, text="Clear", command=self.clear_edit_card,
                               bg='#4cb5f5', font=("Poppins SemiBold", 10, "bold"), bd=0,
-                              fg='#fff', cursor='hand2', activebackground='#4cb5f5', activeforeground='#ffffff')
+                              fg='#fff', cursor='hand2', activebackground='#4cb5f5', activeforeground='#ffffff',  width=10 ,height=2)
         self.button6.grid(row=len(self.columns)+3, column=1, padx=5, pady=5, sticky="ew")    
     # def save_data(self):
         
