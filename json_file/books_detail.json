@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 {
     "books": [
         {
@@ -20,3 +21,6 @@
         }
     ]
 }
+=======
+{"books": [{"title": "Ti\u1ec3u thuy\u1ebft 1", "authors": "T\u00e1c gi\u1ea3 A", "genre": "Ti\u1ec3u thuy\u1ebft", "year": "1990", "pages": "350", "image_path": "images//chuong.png"}, {"title": "Ti\u1ec3u thuy\u1ebft 1", "authors": "T\u00e1c gi\u1ea3 A", "genre": "Ti\u1ec3u thuy\u1ebft", "year": "1990", "pages": "350", "image_path": "C:/Users/chuon/Downloads/1406.png", "description": "asa"}, {"title": "Ti\u1ec3u thuy\u1ebft 1", "authors": "T\u00e1c gi\u1ea3 A", "genre": "Ti\u1ec3u thuy\u1ebft", "year": "1990", "pages": "350", "image_path": "C:/Users/chuon/Downloads/spring.png"}, {"title": "Ti\u1ec3u thuy\u1ebft 5", "authors": "T\u00e1c gi\u1ea3 nguyen chuong", "genre": "Ti\u1ec3u thuy\u1ebft", "year": "1990", "pages": "350", "image_path": "C:/Users/chuon/Desktop/Book-store/images/book.png","description":"asa"}]}
+>>>>>>> 435ee1b8166e1fc45fe410d0cdfe5b6ca50cf5a1
