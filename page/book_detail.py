@@ -8,6 +8,9 @@ from tkinter import messagebox
 
 import threading
 from time import sleep
+from bs4 import BeautifulSoup
+
+
 class BookDetailWindow:
     @staticmethod
     def format_authors(authors):
@@ -21,14 +24,27 @@ class BookDetailWindow:
         else:
             return ""
     def __init__(self, master, book_info,is_Owner,on_read_callback=None):
+<<<<<<< HEAD
+        if not master.winfo_exists(): 
+            # If the master is destroyed, show an error message 
+            messagebox.showerror("Error", "Cannot create BookDetailWindow. The parent window is closed.")
+            return  
+        self.window = Toplevel(master)  # Create as Toplevel of the main window
+=======
         print(book_info)
         self.window = Toplevel(master) # Tạo một cửa sổ top-level mới
+>>>>>>> 435ee1b8166e1fc45fe410d0cdfe5b6ca50cf5a1
         self.window.title('Thông tin chi tiết sách')
 
         Label(self.window, text="Tiêu đề: "+book_info['title']).pack()
         Label(self.window, text="Tác giả: " + self.format_authors(book_info['authors'])).pack()
 
+<<<<<<< HEAD
+        if 'description' in book_info:  # Chỉ hiển thị nếu có thông tin nhà xuất bản
+            Label(self.window, text="Mô tả: "+book_info['description']).pack()
+=======
         Label(self.window, text="Mô tả: "+book_info['description']).pack()
+>>>>>>> 435ee1b8166e1fc45fe410d0cdfe5b6ca50cf5a1
         if 'publisher' in book_info:  # Chỉ hiển thị nếu có thông tin nhà xuất bản
             Label(self.window, text="Nhà xuất bản: " + book_info['publisher']).pack()
 
@@ -45,12 +61,23 @@ class BookDetailWindow:
         if is_Owner == 'json':
             read_button = Button(self.window, text="Đọc", command=lambda: self.open_read_page(book_info, on_read_callback))
             read_button.pack()
+<<<<<<< HEAD
+        
+
+ 
+=======
 
         self.window.mainloop()
+>>>>>>> 435ee1b8166e1fc45fe410d0cdfe5b6ca50cf5a1
     def open_read_page(self, book_info, on_read_callback):
            read_confirm = messagebox.askyesno("Xác nhận", "Bạn có muốn đọc '" + book_info['title'] + "' không?")
 
            if read_confirm and on_read_callback:
+<<<<<<< HEAD
+               self.window.destroy()  # Đóng cửa sổ chi tiết sau khi người dùng chọn Đọc
+               on_read_callback(book_info)
+=======
                on_read_callback(book_info)
                self.window.destroy()  # Đóng cửa sổ chi tiết sau khi người dùng chọn Đọc
+>>>>>>> 435ee1b8166e1fc45fe410d0cdfe5b6ca50cf5a1
 

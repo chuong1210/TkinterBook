@@ -3,7 +3,6 @@ from PIL import ImageTk, Image,ImageDraw
 import json
 from page.user import run_user
 from page.admin import run_admin
-from support_app import destroy_window
 with open('json_file\\users_login.json') as f:
     user_data = json.load(f)
 

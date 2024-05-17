@@ -11,6 +11,12 @@ from manage_table import ManageTable
 import threading
 from time import sleep
 from tkinter import filedialog
+from bs4 import BeautifulSoup
+from tkinter import scrolledtext
+from gtts import gTTS
+import os
+
+
 colorBg="f0f8ff"
 with open('json_file\\users_login.json') as f:
     user_data = json.load(f)
@@ -22,6 +28,8 @@ class adminPage:
         self.window = master
         self.window.geometry("{0}x{1}+0+0".format(self.window.winfo_screenwidth(), self.window.winfo_screenheight()))
         self.window.title('Trang Admin')
+        self.current_user = user_info
+
         self.create_header()
         self.create_sidebar()
         self.create_header_line()
@@ -29,7 +37,6 @@ class adminPage:
         self.main_frame = None
 
         self.create_main_content()
-        self.current_user = user_info
         self.window.grid_rowconfigure(0, weight=0)  # Header không nên mở rộng khi cửa sổ được chỉnh kích thước
         self.window.grid_rowconfigure(1, weight=1)  # Nhưng main frame và sidebar nên mở rộng
         self.window.grid_columnconfigure(0, weight=0)  # Sidebar không nên mở rộng
@@ -127,13 +134,15 @@ class adminPage:
         # self.button6.configure(borderwidth="0")
         # self.button6.configure(text="""Đăng xuất""")
         # self.button6.configure(command=self.exit)
+        greeting_text = f"Xin chào, { self.current_user['username']}"
+        self.greeting_label = Label(header_frame, text=greeting_text, bg='#108690', fg='white', font=("Poppins SemiBold", 13, "bold"))
+        self.greeting_label.pack(side='left', padx=10)
 
-                       # ========== LOG OUT =======
         logout_button = Button(header_frame, text='Logout', bg='#4cb5f5', font=("Poppins SemiBold", 13, "bold"), bd=0,
                                             fg='#fff',
                                         cursor='hand2', activebackground='#4cb5f5', activeforeground='#ffffff',
                                        command=self.exit)
-        logout_button.place(relx=0.82, rely=0.300, width=96, height=45)
+        logout_button.place(relx=0.88, rely=0.300, width=96, height=45)
 
     def view_account_info(self):
     # Code to view account info goes here
@@ -234,49 +243,55 @@ class adminPage:
         for widget in self.main_frame.winfo_children():
                         widget.destroy()
     def replace_password(self):
-        self.window = Toplevel()
+        self.change_password_window = Toplevel(self.window)  # Create as a child of adminPage
         window_width = 350
         window_height = 350
-        s_width = self.window.winfo_screenwidth()
-        s_height = self.window.winfo_screenheight()
+        s_width = self.change_password_window.winfo_screenwidth()
+        s_height = self.change_password_window.winfo_screenheight()
         p_top = int(s_height / 4 - window_height / 4)
         p_right = int(s_width / 2 - window_width / 2)
-        self.window.geometry(f'{window_width}x{window_height}+{p_right}+{p_top}')
-        self.window.title('Đổi mật khẩu')
-        self.window.iconbitmap('images\\changepw.ico')
-        self.window.configure(background='#f8f8f8')
-        self.window.resizable(0, 0)
+        self.change_password_window.geometry(f'{window_width}x{window_height}+{p_right}+{p_top}')
+        self.change_password_window.title('Đổi mật khẩu')
+        self.change_password_window.iconbitmap('images\\changepw.ico')
+        self.change_password_window.configure(background='#f8f8f8')
+        self.change_password_window.resizable(0, 0)
 
-    # ====== Username ====================
-        username_entry = Entry(self.window, fg="#a7a7a7", font=("arial semibold", 12), highlightthickness=2,cursor="hand2")
+        username_entry = Entry(self.change_password_window, fg="#a7a7a7", font=("arial semibold", 12), highlightthickness=2,cursor="hand2")
         username_entry.insert(0, self.current_user['username'])  # Set the default value
         username_entry.config(state='disabled')
         username_entry.place(x=40, y=30, width=256, height=34)
-        username_lbel = Label(self.window, text='Tài khoản Username ', fg="#89898b", bg='#f8f8f8',
+        username_lbel = Label(self.change_password_window, text='Tài khoản Username ', fg="#89898b", bg='#f8f8f8',
                          font=("arial", 11, 'bold'))
         username_lbel.place(x=40, y=0)
 
-    # ====  New Password ==================
-        old_password_entry = Entry(self.window, fg="#280659", font=("arial semibold", 12), show='•', highlightthickness=3)
+        old_password_entry = Entry(self.change_password_window, fg="#280659", font=("arial semibold", 12), show='•', highlightthickness=3)
         old_password_entry.place(x=40, y=110, width=256, height=34)
         old_password_entry.config(highlightbackground="black", highlightcolor="black")
-        old_password_label = Label(self.window, text='Nhập lại Mật khẩu cũ', fg="#000", bg='#f8f8f8', font=("arial", 12, 'bold'))
+        old_password_label = Label(self.change_password_window, text='Nhập lại Mật khẩu cũ', fg="#000", bg='#f8f8f8', font=("arial", 12, 'bold'))
         old_password_label.place(x=40, y=80)
 
     # ====  Confirm Password ==================
-        new_password_entry = Entry(self.window, fg="#280659", font=("arial semibold", 12), show='•', highlightthickness=3)
+        new_password_entry = Entry(self.change_password_window, fg="#280659", font=("arial semibold", 12), show='•', highlightthickness=3)
         new_password_entry.place(x=40, y=190, width=256, height=34)
         new_password_entry.config(highlightbackground="black", highlightcolor="black")
-        new_password_label = Label(self.window, text='Mật khẩu mới', fg="#000", bg='#f8f8f8',
+        new_password_label = Label(self.change_password_window, text='Mật khẩu mới', fg="#000", bg='#f8f8f8',
                                    font=("arial", 12, 'bold'))
         new_password_label.place(x=40, y=160)
       
-        error_message_label = Label(self.window, text='', bg='#f8f8f8')
+        error_message_label = Label(self.change_password_window, text='', bg='#f8f8f8')
         error_message_label.place (x=40, y=230)
     # ======= Update password Button ============
-        update_pass = Button(self.window, fg='#f8f8f8',command=lambda: self.change_password_inFile(old_password_entry,new_password_entry,error_message_label), text='Cập nhật mật khẩu', bg='#1b87d2', font=("arial bold", 14),
+        update_pass = Button(self.change_password_window, fg='#f8f8f8',command=lambda: self.change_password_inFile(old_password_entry,new_password_entry,error_message_label), text='Cập nhật mật khẩu', bg='#1b87d2', font=("arial bold", 14),
                          cursor='hand2', activebackground='#000181')
         update_pass.place(x=40, y=255, width=256, height=50)
+        
+        def close_window():
+            self.change_password_window.destroy()  # Trì hoãn đóng cửa sổ 100 mili giây
+            
+
+        self.change_password_window.protocol("WM_DELETE_WINDOW", close_window)
+
+
     def change_password_inFile(self, old_pass_entry, new_pass_entry,error_message_label):
         old_pass = old_pass_entry.get()
         new_pass = new_pass_entry.get()
@@ -294,7 +309,6 @@ class adminPage:
             with open('json_file\\users_login.json', 'w') as f:
                 json.dump(user_data, f)
             error_message_label.config(text='Mật khẩu được cập nhật thành công.', fg='green')
-            print("sasasa")
         else:
             error_message_label.config(text='Mật khẩu cũ không đúng.', fg='red')     
  
@@ -347,6 +361,57 @@ class adminPage:
                         pass
             else:
                  self.display_all_books_json()
+<<<<<<< HEAD
+    def read_data(self,url):
+ 
+        response = requests.get(url)
+        response.raise_for_status()  # Raise an error if the request fails
+
+        soup = BeautifulSoup(response.content, 'html.parser')
+
+        # paragraphs=data.find_all("p")
+        #         for pa in paragraphs:
+        #             print(pa.text)
+        paragraphs = soup.find_all("p")
+    
+        scraped_text = "\n".join([p.get_text() for p in paragraphs])
+        return scraped_text
+ 
+    
+    def show_book_content(self, book_info):
+
+        self.clear_main_content()
+
+        # Sử dụng một Text widget cho cả tiêu đề và nội dung
+        content_text = Text(self.main_frame, wrap='word', font=("Helvetica Neue", 20),background="#eeeeee")
+        
+        # Insert the title into the Text widget
+        content_text.insert('1.0', book_info['title'] + "\n", 'title')
+        content_text.tag_configure('title', font=("Helvetica", 26), foreground="#fff", background="#00CDCD",justify="center",spacing1=10 ,spacing3=10)
+        content_text.tag_add("center", "1.0", "end")
+
+
+        content_url = book_info.get('content_url')
+
+        if content_url:
+            scraped_content = self.read_data(content_url)
+            if scraped_content:
+                # Thêm nội dung vào widget Text dưới tiêu đề
+                content_text.insert('end', "\n" + scraped_content)
+            else:
+                content_text.insert('end', "\nError: Could not fetch book content.")
+        else:
+            content_text.insert('end', "\nError: Book content URL not found.")
+
+        # Tạo Scrollbar và định cấu hình để nó hoạt động với widget Text
+        scrollbar = Scrollbar(self.main_frame, command=content_text.yview)
+        content_text['yscrollcommand'] = scrollbar.set
+
+        # Đóng gói Scrollbar và để Text widget cuộn được
+        scrollbar.pack(side='right', fill='y')
+        content_text.pack(side='left', expand=True, fill='both')
+        content_text.config(state='disabled')  # Disable editing of
+=======
 
     def show_book_content(self, book_info):
         self.clear_main_content()
@@ -355,6 +420,7 @@ class adminPage:
         # Tiếp theo là hiển thị nội dung của sách theo book_info['content'] hoặc tương tự
         content_label = Label(self.main_frame, text=book_info['description'], wraplength=self.main_frame.winfo_width())
         content_label.pack()
+>>>>>>> 435ee1b8166e1fc45fe410d0cdfe5b6ca50cf5a1
     def display_all_books_json(self):
     # Đọc file JSON
     
@@ -422,7 +488,16 @@ class adminPage:
 # logout_button.place(x=420, y=15)
 
     def show_book_detail(self, book,isOwner):
+<<<<<<< HEAD
+        if self.window.winfo_exists():
+            BookDetailWindow(self.window, book, isOwner, self.show_book_content)
+        else:
+            # Show an error message if the adminPage window is closed
+            messagebox.showerror("Error", "Cannot create BookDetailWindow. The parent window is closed.")
+        # Close the book detail window when it is closed
+=======
         BookDetailWindow(self.window, book,isOwner, self.show_book_content)
+>>>>>>> 435ee1b8166e1fc45fe410d0cdfe5b6ca50cf5a1
     def manage_users(self):
         self.clear_main_content()
         user_columns = ("username", "password","type")
@@ -443,7 +518,11 @@ class adminPage:
 
     def manage_books(self):
         self.clear_main_content()
+<<<<<<< HEAD
+        book_columns = ("title", "authors", "genre", "year", "pages","image_path","content_url")
+=======
         book_columns = ("title", "authors", "genre", "year", "pages","image_path")
+>>>>>>> 435ee1b8166e1fc45fe410d0cdfe5b6ca50cf5a1
         self.book_table = ManageTable(self.main_frame, "json_file\\books_detail.json", "books", book_columns,"Sách",allow_images=True)
 
 
@@ -472,6 +551,7 @@ class adminPage:
 def run_admin(window,user_info):
    # window = Tk()
     adminPage(window,user_info)
+
 
 def page():
     window = Tk()
