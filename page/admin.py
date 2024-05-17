@@ -361,7 +361,6 @@ class adminPage:
                         pass
             else:
                  self.display_all_books_json()
-<<<<<<< HEAD
     def read_data(self,url):
  
         response = requests.get(url)
@@ -411,16 +410,8 @@ class adminPage:
         scrollbar.pack(side='right', fill='y')
         content_text.pack(side='left', expand=True, fill='both')
         content_text.config(state='disabled')  # Disable editing of
-=======
 
-    def show_book_content(self, book_info):
-        self.clear_main_content()
-        title_label = Label(self.main_frame, text=book_info['title'], font=("Helvetica", 16))
-        title_label.pack()
-        # Tiếp theo là hiển thị nội dung của sách theo book_info['content'] hoặc tương tự
-        content_label = Label(self.main_frame, text=book_info['description'], wraplength=self.main_frame.winfo_width())
-        content_label.pack()
->>>>>>> 435ee1b8166e1fc45fe410d0cdfe5b6ca50cf5a1
+
     def display_all_books_json(self):
     # Đọc file JSON
     
@@ -488,16 +479,12 @@ class adminPage:
 # logout_button.place(x=420, y=15)
 
     def show_book_detail(self, book,isOwner):
-<<<<<<< HEAD
         if self.window.winfo_exists():
             BookDetailWindow(self.window, book, isOwner, self.show_book_content)
         else:
             # Show an error message if the adminPage window is closed
             messagebox.showerror("Error", "Cannot create BookDetailWindow. The parent window is closed.")
         # Close the book detail window when it is closed
-=======
-        BookDetailWindow(self.window, book,isOwner, self.show_book_content)
->>>>>>> 435ee1b8166e1fc45fe410d0cdfe5b6ca50cf5a1
     def manage_users(self):
         self.clear_main_content()
         user_columns = ("username", "password","type")
@@ -518,11 +505,7 @@ class adminPage:
 
     def manage_books(self):
         self.clear_main_content()
-<<<<<<< HEAD
         book_columns = ("title", "authors", "genre", "year", "pages","image_path","content_url")
-=======
-        book_columns = ("title", "authors", "genre", "year", "pages","image_path")
->>>>>>> 435ee1b8166e1fc45fe410d0cdfe5b6ca50cf5a1
         self.book_table = ManageTable(self.main_frame, "json_file\\books_detail.json", "books", book_columns,"Sách",allow_images=True)
 
 
