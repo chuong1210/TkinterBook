@@ -1,6 +1,8 @@
 from tkinter import *
 from tkinter import ttk
 import json
+import tkinter as tk
+
 from tkinter import messagebox
 from PIL import ImageTk, Image,ImageDraw
 from tkinter import filedialog
@@ -47,6 +49,7 @@ class ManageTable:
         # Tạo Treeview
         self.table = ttk.Treeview(self.table_frame, columns=self.columns, show="headings")
 
+
         # Đặt tiêu đề cho các cột
         for col in self.columns:
             self.table.heading(col, text=col)
@@ -55,10 +58,98 @@ class ManageTable:
         scrollbar = ttk.Scrollbar(self.table_frame, orient=VERTICAL, command=self.table.yview)
         self.table.configure(yscrollcommand=scrollbar.set)
         scrollbar.pack(side=RIGHT, fill=Y)
+        style = ttk.Style()
+        style.configure("Treeview.Heading", foreground='black')  # Set black color for heading
+        style.configure("Treeview", rowheight=30,  # Increase row height
+                        background="#ffffff",  # Set background color
+                        fieldbackground="#ffffff",  # Set field background color
+                        foreground='black',  # Set text color
+                        borderwidth=0,  # Remove border width for cleaner look
+                        highlightthickness=0)  # Remove highlight thickness for cleaner look
+        style.map("Treeview", background=[('selected', '#4cb5f5')],
+                foreground=[('selected', 'black')])  # Change the color of selected row
 
+        # Add grid lines (using `separators` property)
+        style.configure("Treeview.separator", background="black", thickness=1)
+        children = self.table.get_children()
+        num_rows = len(children)  # Get the number of rows
+
+        for i in range(num_rows):
+        # Add a black line between each row using `itemconfigure`
+            self.table.itemconfigure(self.table.get_children()[i], background="#ffffff")
+            self.table.tag_configure("line", background="black")
+            self.table.itemconfigure(self.table.get_children()[i], tags="line")
+
+  
+        # Set center alignment for all columns
+        for col in self.columns:
+            self.table.column(col, anchor=tk.CENTER)
+
+        self.table.grid_rowconfigure(0, minsize=30)
+        for i in range(len(self.columns)):
+            self.table.grid_columnconfigure(i, minsize=100)
         self.table.pack(fill=BOTH, expand=True)
+
+
         self.edit_card_frame = Frame(self.master, bd=1, relief="solid")
         self.edit_card_frame.pack(padx=20, pady=20)
+
+
+        design_line = Canvas(self.table, width=1000, height=1.5, bg="#e6e6e6", highlightthickness=0)
+        design_line.place(x=0, y=23)
+
+        design_line2 = Canvas(self.table, width=1000, height=1.5, bg="#e6e6e6", highlightthickness=0)
+        design_line2.place(x=0, y=54)
+
+        design_line3 = Canvas(self.table, width=1000, height=1.5, bg="#e6e6e6", highlightthickness=0)
+        design_line3.place(x=0, y=84)
+
+        design_line4 = Canvas(self.table, width=1000, height=1.5, bg="#e6e6e6", highlightthickness=0)
+        design_line4.place(x=0, y=112)
+
+        design_line5 = Canvas(self.table, width=1000, height=1.5, bg="#e6e6e6", highlightthickness=0)
+        design_line5.place(x=0, y=146)
+
+        design_line6 = Canvas(self.table, width=1000, height=1.5, bg="#e6e6e6", highlightthickness=0)
+        design_line6.place(x=0, y=180)
+
+        design_line7 = Canvas(self.table, width=1000, height=1.5, bg="#e6e6e6", highlightthickness=0)
+        design_line7.place(x=0, y=214)
+
+        design_line8 = Canvas(self.table, width=1000, height=1.5, bg="#e6e6e6", highlightthickness=0)
+        design_line8.place(x=0, y=248)
+
+        design_line9 = Canvas(self.table, width=1000, height=1.5, bg="#e6e6e6", highlightthickness=0)
+        design_line9.place(x=0, y=282)
+
+        design_line10 = Canvas(self.table, width=1000, height=1.5, bg="#e6e6e6", highlightthickness=0)
+        design_line10.place(x=0, y=316)
+
+        design_line11 = Canvas(self.table, width=1000, height=1.5, bg="#e6e6e6", highlightthickness=0)
+        design_line11.place(x=0, y=350)
+
+        design_line12 = Canvas(self.table, width=1000, height=1.5, bg="#e6e6e6", highlightthickness=0)
+        design_line12.place(x=0, y=384)
+
+        design_line13 = Canvas(self.table, width=1000, height=1.5, bg="#e6e6e6", highlightthickness=0)
+        design_line13.place(x=0, y=418)
+
+        design_line14 = Canvas(self.table, width=1000, height=1.5, bg="#e6e6e6", highlightthickness=0)
+        design_line14.place(x=0, y=452)
+
+        design_line15 = Canvas(self.table, width=1000, height=1.5, bg="#e6e6e6", highlightthickness=0)
+        design_line15.place(x=0, y=486)
+
+        design_line16 = Canvas(self.table, width=1000, height=1.5, bg="#e6e6e6", highlightthickness=0)
+        design_line16.place(x=0, y=520)
+
+        design_line17 = Canvas(self.table, width=1000, height=1.5, bg="#e6e6e6", highlightthickness=0)
+        design_line17.place(x=0, y=554)
+
+        design_line18 = Canvas(self.table, width=1000, height=1.5, bg="#e6e6e6", highlightthickness=0)
+        design_line18.place(x=0, y=588)
+
+      
     def update_book_image(self):
         if not self.table.selection():
             messagebox.showerror("Error", "Please select a book to update.")

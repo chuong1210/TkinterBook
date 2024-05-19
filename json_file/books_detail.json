@@ -1,23 +1,2 @@
-{
-    "books": [
-        {
-            "title": "The Hitchhiker's Guide to the Galaxy",
-            "authors": ["Douglas Adams"],
-            "genre": "Science Fiction",
-            "year": 1979,
-            "pages": 224,
-            "image_path": "images\\CHUONG.png",
-            "content_url": "https://nhasachmienphi.com/doc-online/bach-da-hanh-311519" 
-        },
-        {
-            "title": "Pride and Prejudice",
-            "authors": ["Jane Austen"],
-            "genre": "Romance",
-            "year": 1813,
-            "pages": 432,
-            "image_path": "images\\huit.png",
-            "content_url": "https://nhasachmienphi.com/doc-online/bach-da-hanh-311519" 
-        }
-    ]
-}
-
+{"books": [{"title": "The Hitchhiker's Guide to the Galaxy", "authors": "{Douglas Adams}", "genre": "Science Fiction", "year": "1979", "pages": "211", "image_path": "images\\CHUONG.png", "content_url": "https://nhasachmienphi.com/doc-online/bach-da-hanh-311518","chapter":"2"},
+ {"title": "Pride and Prejudice", "authors": ["Jane Austen"], "genre": "Romance", "year": 1813, "pages": 432, "image_path": "images\\huit.png", "content_url": "https://nhasachmienphi.com/doc-online/bach-da-hanh-311518","chapter":"2"}]}

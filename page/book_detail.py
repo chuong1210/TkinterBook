@@ -29,7 +29,6 @@ class BookDetailWindow:
             messagebox.showerror("Error", "Cannot create BookDetailWindow. The parent window is closed.")
             return  
         self.window = Toplevel(master)  # Create as Toplevel of the main window
-        print(book_info)
         self.window.title('Thông tin chi tiết sách')
 
         Label(self.window, text="Tiêu đề: "+book_info['title']).pack()

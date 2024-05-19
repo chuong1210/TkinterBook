@@ -15,6 +15,7 @@ from bs4 import BeautifulSoup
 from tkinter import scrolledtext
 from gtts import gTTS
 import os
+import re
 
 
 colorBg="f0f8ff"
@@ -29,7 +30,9 @@ class adminPage:
         self.window.geometry("{0}x{1}+0+0".format(self.window.winfo_screenwidth(), self.window.winfo_screenheight()))
         self.window.title('Trang Admin')
         self.current_user = user_info
-
+        self.first_chapter =1
+        self.last_chapter=0
+        
         self.create_header()
         self.create_sidebar()
         self.create_header_line()
@@ -135,8 +138,8 @@ class adminPage:
         # self.button6.configure(text="""Đăng xuất""")
         # self.button6.configure(command=self.exit)
         greeting_text = f"Xin chào, { self.current_user['username']}"
-        self.greeting_label = Label(header_frame, text=greeting_text, bg='#108690', fg='white', font=("Poppins SemiBold", 13, "bold"))
-        self.greeting_label.pack(side='left', padx=10)
+        self.greeting_label = Label(header_frame, text=greeting_text, bg='#108690', fg='white', font=("Poppins SemiBold", 15, "bold"))
+        self.greeting_label.place(x=990, y=38)
 
         logout_button = Button(header_frame, text='Logout', bg='#4cb5f5', font=("Poppins SemiBold", 13, "bold"), bd=0,
                                             fg='#fff',
@@ -270,7 +273,6 @@ class adminPage:
         old_password_label = Label(self.change_password_window, text='Nhập lại Mật khẩu cũ', fg="#000", bg='#f8f8f8', font=("arial", 12, 'bold'))
         old_password_label.place(x=40, y=80)
 
-    # ====  Confirm Password ==================
         new_password_entry = Entry(self.change_password_window, fg="#280659", font=("arial semibold", 12), show='•', highlightthickness=3)
         new_password_entry.place(x=40, y=190, width=256, height=34)
         new_password_entry.config(highlightbackground="black", highlightcolor="black")
@@ -280,7 +282,6 @@ class adminPage:
       
         error_message_label = Label(self.change_password_window, text='', bg='#f8f8f8')
         error_message_label.place (x=40, y=230)
-    # ======= Update password Button ============
         update_pass = Button(self.change_password_window, fg='#f8f8f8',command=lambda: self.change_password_inFile(old_password_entry,new_password_entry,error_message_label), text='Cập nhật mật khẩu', bg='#1b87d2', font=("arial bold", 14),
                          cursor='hand2', activebackground='#000181')
         update_pass.place(x=40, y=255, width=256, height=50)
@@ -375,11 +376,54 @@ class adminPage:
     
         scraped_text = "\n".join([p.get_text() for p in paragraphs])
         return scraped_text
- 
-    
+    def get_chapter_range(self, book_info):
+        # Bạn sẽ cần phương thức hoặc logic cụ thể để lấy chương đầu và cuối từ book_info hoặc một nguồn khác.
+        # Ở đây tôi giả định chương đầu tiên và cuối cùng lưu trong book_info là 'first_chapter' và 'last_chapter'.
+        first_chap = book_info.get('first_chapter', 1)  # Nếu không có thông tin, giả định là 1 bắt đầu từ chương đầu tiên.
+        last_chap = book_info.get('chapter')  # Giả định bạn đã lấy được thông tin này từ một nơi nào đó.
+
+        return (first_chap, last_chap)
+    def change_chap(self, book_info, direction):
+        content_url = book_info.get('content_url')
+        current_chap_str = re.search(r"-(\d+)$", content_url)
+        first_chap, last_chap = self.get_chapter_range(book_info) 
+        self.last_chapter=int(last_chap)
+        self.first_chapter = int(self.first_chapter)
+        if current_chap_str:
+            current_numberChap = int(current_chap_str.group(1))
+
+            new_chap = self.first_chapter+ direction
+            self.first_chapter=new_chap
+            new_numberChap=current_numberChap+direction
+            # Kiểm tra xem có phải là chương đầu tiên hoặc không còn chương tiếp theo
+            if new_chap < 1:
+                self.first_chapter=1
+                new_numberChap=current_numberChap+1
+                messagebox.showinfo("Thông báo", "Đã đến chương đầu tiên.")
+                
+
+                return
+            elif new_chap >self.last_chapter:  # Giả sử bạn có hàm này để lấy số lượng chương cuối cùng
+                messagebox.showinfo("Thông báo", "Đã đến chương cuối cùng.")
+                self.first_chapter=book_info['chapter']
+
+                new_numberChap=current_numberChap-1
+
+                return
+            print(new_chap)
+            print(new_numberChap)
+            # Cập nhật URL để cào chương mới
+            new_content_url = re.sub(r"(\d+)$", str(new_numberChap), content_url)
+            book_info["content_url"] = new_content_url
+
+            # Cào và hiển thị nội dung chương mới
+            self.show_book_content(book_info)
+        else:
+            messagebox.showerror("Lỗi", "URL không hợp lệ.")
     def show_book_content(self, book_info):
 
         self.clear_main_content()
+
 
         # Sử dụng một Text widget cho cả tiêu đề và nội dung
         content_text = Text(self.main_frame, wrap='word', font=("Helvetica Neue", 20),background="#eeeeee")
@@ -388,11 +432,20 @@ class adminPage:
         content_text.insert('1.0', book_info['title'] + "\n", 'title')
         content_text.tag_configure('title', font=("Helvetica", 26), foreground="#fff", background="#00CDCD",justify="center",spacing1=10 ,spacing3=10)
         content_text.tag_add("center", "1.0", "end")
+        button_frame = Frame(self.main_frame)
+        button_frame.pack(side='top')
 
+        # Nút Chap trước
+        prev_chap_button = Button(button_frame, text="Chap trước", command=lambda: self.change_chap(book_info, -1))
+        prev_chap_button.pack(side='left', padx=5, pady=5)
 
+        # Nút Chap tiếp theo
+        next_chap_button = Button(button_frame, text="Chap tiếp theo", command=lambda: self.change_chap(book_info, 1))
+        next_chap_button.pack(side='left', padx=5, pady=5)
         content_url = book_info.get('content_url')
 
         if content_url:
+            
             scraped_content = self.read_data(content_url)
             if scraped_content:
                 # Thêm nội dung vào widget Text dưới tiêu đề
@@ -480,6 +533,8 @@ class adminPage:
 
     def show_book_detail(self, book,isOwner):
         if self.window.winfo_exists():
+            self.first_chapter=1
+            self.last_chapter=book['chapter']
             BookDetailWindow(self.window, book, isOwner, self.show_book_content)
         else:
             # Show an error message if the adminPage window is closed
@@ -505,7 +560,7 @@ class adminPage:
 
     def manage_books(self):
         self.clear_main_content()
-        book_columns = ("title", "authors", "genre", "year", "pages","image_path","content_url")
+        book_columns = ("title", "authors", "genre", "year", "pages","image_path","chapter","content_url")
         self.book_table = ManageTable(self.main_frame, "json_file\\books_detail.json", "books", book_columns,"Sách",allow_images=True)
 
 
