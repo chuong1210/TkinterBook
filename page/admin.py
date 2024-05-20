@@ -19,7 +19,7 @@ import re
 
 
 colorBg="f0f8ff"
-with open('json_file\\users_login.json') as f:
+with open('json_file\\users_detail.json') as f:
     user_data = json.load(f)
 
 
@@ -59,8 +59,12 @@ class adminPage:
         sidebar_frame.place(relheight=1, relwidth=0.09)
 
         # tải và hiển thị avatar người dùng
-        self.pil_image = Image.open('images\\CHUONG.png')
-
+        avatar_path = self.current_user['image_path']  # Lấy đường dẫn ảnh từ user_info
+        try:
+            self.pil_image = Image.open(avatar_path)
+        except FileNotFoundError:
+            # Sử dụng ảnh mặc định nếu không tìm thấy ảnh
+            self.pil_image = Image.open('images\\CHUONG.png') 
         width, height = self.pil_image.size
         new_width = width // 7
         new_height = height // 7
@@ -307,7 +311,7 @@ class adminPage:
                     user['password'] = new_pass
 
             # Lưu lại json file
-            with open('json_file\\users_login.json', 'w') as f:
+            with open('json_file\\users_detail.json', 'w') as f:
                 json.dump(user_data, f)
             error_message_label.config(text='Mật khẩu được cập nhật thành công.', fg='green')
         else:
@@ -542,8 +546,8 @@ class adminPage:
         # Close the book detail window when it is closed
     def manage_users(self):
         self.clear_main_content()
-        user_columns = ("username", "password","type")
-        self.user_table = ManageTable(self.main_frame, "json_file\\users_login.json", "users", user_columns,"Độc gia")
+        user_columns = ("username", "password","type","email","image_path")
+        self.user_table = ManageTable(self.main_frame, "json_file\\users_detail.json", "users", user_columns,"Độc gia",True)
         intermediate_frame = Frame(self.main_frame)
         intermediate_frame.pack(fill=BOTH, expand=True)
 
@@ -595,9 +599,11 @@ def page():
     window = Tk()
     window.geometry("{0}x{1}+0+0".format(window.winfo_screenwidth(), window.winfo_screenheight()))
     adminPage(window,   {
-            "username": "user3",
-            "password": "password3",
-            "type": "admin"
+            "username": "user1",
+            "password": "password1",
+            "type": "admin",
+            "email": "user1@example.com", 
+            "image_path": "images/publisher.png"
         })
     window.mainloop()
 

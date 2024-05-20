@@ -3,7 +3,7 @@ from tkinter import *
 from PIL import ImageTk, Image,ImageDraw
 import json
 colorBg="f0f8ff"
-with open('json_file\\users_login.json') as f:
+with open('json_file\\users_detail.json') as f:
     user_data = json.load(f)
 
 class userPage:
@@ -11,12 +11,12 @@ class userPage:
     def __init__(self, master,user_info):
         self.window = master
         self.window.geometry("{0}x{1}+0+0".format(self.window.winfo_screenwidth(), self.window.winfo_screenheight()))
+        self.current_user = user_info
         self.create_header()
         self.create_sidebar()
         self.create_header_line()
 
         self.create_main_content()
-        self.current_user = user_info
         self.window.grid_rowconfigure(0, weight=0)  # Header không nên mở rộng khi cửa sổ được chỉnh kích thước
         self.window.grid_rowconfigure(1, weight=1)  # Nhưng main frame và sidebar nên mở rộng
         self.window.grid_columnconfigure(0, weight=0)  # Sidebar không nên mở rộng
@@ -29,8 +29,12 @@ class userPage:
         sidebar_frame.place(relheight=1, relwidth=0.09)
 
         # tải và hiển thị avatar người dùng
-        self.pil_image = Image.open('images\\CHUONG.png')
-
+        avatar_path = self.current_user['image_path']  # Lấy đường dẫn ảnh từ user_info
+        try:
+            self.pil_image = Image.open(avatar_path)
+        except FileNotFoundError:
+            # Sử dụng ảnh mặc định nếu không tìm thấy ảnh
+            self.pil_image = Image.open('images\\CHUONG.png') 
         width, height = self.pil_image.size
         new_width = width // 7
         new_height = height // 7
@@ -215,7 +219,10 @@ def page():
     userPage(window,   {
             "username": "user3",
             "password": "password3",
-            "type": "admin"
+            "type": "admin",
+             "email": "user1@example.com", 
+            "image_path": "images/publisher.png"
+
         })
     window.mainloop()
 
