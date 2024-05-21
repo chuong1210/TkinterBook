@@ -38,6 +38,7 @@ class adminPage:
         self.create_header_line()
 
         self.main_frame = None
+        self.change_password_window = None 
 
         self.create_main_content()
         self.window.grid_rowconfigure(0, weight=0)  # Header không nên mở rộng khi cửa sổ được chỉnh kích thước
@@ -45,18 +46,93 @@ class adminPage:
         self.window.grid_columnconfigure(0, weight=0)  # Sidebar không nên mở rộng
         self.window.grid_columnconfigure(1, weight=1)  # Main frame nên mở rộng
         self.images = []
+        self.camera_icon_pil = Image.open('images//camera-icon.png').resize((20, 20)) # Sử dụng PIL
+        self.camera_icon = ImageTk.PhotoImage(self.camera_icon_pil)
+
+
+
     
     def exit(self):
         exit_command = messagebox.askyesno("Xác nhận","Bạn có muốn đăng xuất không")
         messagebox.CANCEL
         if exit_command > 0:
             self.window.destroy()
+    def show_camera(self, event):
+        avatar_copy = self.pil_image.copy()
+        # Kết hợp ảnh camera lên ảnh avatar
+        avatar_copy.paste(self.camera_icon_pil, (avatar_copy.width // 2 - self.camera_icon_pil.width // 2, avatar_copy.height // 2 - self.camera_icon_pil.height // 2), self.camera_icon_pil) # Đặt camera ở giữa avatar
+        # Cập nhật Label cho avatar
+        self.avatar_img = ImageTk.PhotoImage(avatar_copy) 
+        self.avatar_label.config(image=self.avatar_img)
+        self.avatar_label.image = self.avatar_img 
+    # Hàm ẩn ảnh máy ảnh khi chuột rời đi
+    def hide_camera(self, event):
+        avatar_path = self.current_user['image_path']  # Lấy đường dẫn ảnh từ user_info
+        try:
+            self.pil_image = Image.open(avatar_path)
+        except FileNotFoundError:
+            # Sử dụng ảnh mặc định nếu không tìm thấy ảnh
+            self.pil_image = Image.open('images\\CHUONG.png') 
+    # Tải lại ảnh avatar
+        self.pil_image = Image.open(avatar_path)
+        width, height = self.pil_image.size
+        new_width = width // 7
+        new_height = height // 7
+        self.pil_image = self.pil_image.resize((new_width, new_height))
+
+            # Tạo hình tròn cho avatar
+        mask = Image.new("L", (new_width, new_height), 0)
+        draw = ImageDraw.Draw(mask)
+        draw.ellipse((0, 0, new_width, new_height), fill=255)
+        self.pil_image = Image.composite(self.pil_image, Image.new("RGBA", (new_width, new_height), 0), mask)
+        self.avatar_img = ImageTk.PhotoImage(self.pil_image) 
+
+            # Cập nhật Label cho avatar
+        self.avatar_label.config(image=self.avatar_img)
+        self.avatar_label.image = self.avatar_img 
+        print("sa")
+    # Hàm thay đổi avatar
+    def change_avatar(self, event):
+        file_path = filedialog.askopenfilename(
+            initialdir="/",
+            title="Chọn ảnh đại diện",
+            filetypes=(("Hình ảnh", "*.jpg *.jpeg *.png"), ("Tất cả tệp", "*.*"))
+        )
+        if file_path:
+            # Cập nhật đường dẫn ảnh vào dữ liệu người dùng
+            self.current_user['image_path'] = file_path
+
+            # Cập nhật file JSON
+            for user in user_data['users']:
+                if user['username'] == self.current_user['username']:
+                    user['image_path'] = file_path
+            with open('json_file\\users_detail.json', 'w') as f:
+                json.dump(user_data, f)
+
+            # Tải lại ảnh avatar
+            self.pil_image = Image.open(file_path)
+            width, height = self.pil_image.size
+            new_width = width // 7
+            new_height = height // 7
+            self.pil_image = self.pil_image.resize((new_width, new_height))
+
+            # Tạo hình tròn cho avatar
+            mask = Image.new("L", (new_width, new_height), 0)
+            draw = ImageDraw.Draw(mask)
+            draw.ellipse((0, 0, new_width, new_height), fill=255)
+            self.pil_image = Image.composite(self.pil_image, Image.new("RGBA", (new_width, new_height), 0), mask)
+            self.avatar_img = ImageTk.PhotoImage(self.pil_image) 
+
+            # Cập nhật Label cho avatar
+            self.avatar_label.config(image=self.avatar_img)
+            self.avatar_label.image = self.avatar_img 
 
     def create_sidebar(self):
         sidebar_frame = Frame(self.window, width=200, bg='#108690')
         #sidebar_frame.grid(row=1, column=0, sticky='ns')
         #sidebar_frame.pack(fill='y', side='left')
         sidebar_frame.place(relheight=1, relwidth=0.09)
+
 
         # tải và hiển thị avatar người dùng
         avatar_path = self.current_user['image_path']  # Lấy đường dẫn ảnh từ user_info
@@ -65,6 +141,8 @@ class adminPage:
         except FileNotFoundError:
             # Sử dụng ảnh mặc định nếu không tìm thấy ảnh
             self.pil_image = Image.open('images\\CHUONG.png') 
+                       # Ảnh máy ảnh
+  
         width, height = self.pil_image.size
         new_width = width // 7
         new_height = height // 7
@@ -77,11 +155,16 @@ class adminPage:
         self.pil_image = Image.composite(self.pil_image, Image.new("RGBA", (new_width, new_height), 0), mask)
 # Tạo mặt nạ hình tròn để hình ảnh
         self.avatar_img = ImageTk.PhotoImage(self.pil_image)  
-        avatar_label = Label(sidebar_frame, image=self.avatar_img, bg='#108690',cursor='hand1')
-        avatar_label.image = self.avatar_img  # Lưu hình ảnh để tránh bị Python hủy
-        avatar_label.pack(side='top', pady=10)
-        avatar_label.bind("<Button-1>", lambda e: self.create_main_content()) 
+        self.avatar_label = Label(sidebar_frame, image=self.avatar_img, bg='#108690',cursor='hand1')
+        self.avatar_label.image = self.avatar_img  # Lưu hình ảnh để tránh bị Python hủy
+        self.avatar_label.pack(side='top', pady=10)
+        self.avatar_label.bind("<Enter>", self.show_camera)
+        self.avatar_label.bind("<Leave>", self.hide_camera)
+        self.avatar_label.bind("<Button-1>", self.change_avatar)            # Bắt sự kiện hover và click
+
         settings_menu = Menu(self.window, tearoff=0)
+        self.home_button = Button(sidebar_frame, fg='#fff', text="Trang chủ", command=self.create_main_content, bg='#108690', height=2,activebackground='#8865ff',activeforeground="#fff")
+        self.home_button.pack(side='top', fill='x', pady=10)
         settings_menu.add_command(label="Đổi mật khẩu", command=self.replace_password,background='#108690')
         settings_menu.add_command(label="Xem thông tin tài khoản", command=self.view_account_info)
 
@@ -89,7 +172,7 @@ class adminPage:
         self.settings_button_text.set('Cài đặt ▼') 
         sidebar_frame.grid_columnconfigure(0, weight=1)  # Cần thiết để các nút mở rộng khi cửa sổ được chỉnh kích thước
 
-        settings_button = Button(sidebar_frame, fg='#fff',textvariable=self.settings_button_text, command=lambda: self.settings_menu_show_hide(settings_menu, settings_button),bg='#108690',height=2)
+        settings_button = Button(sidebar_frame, fg='#fff',textvariable=self.settings_button_text, command=lambda: self.settings_menu_show_hide(settings_menu, settings_button),bg='#108690',height=2,activebackground='#8865ff',activeforeground="#fff")
         settings_button.pack(side='top', fill='x', pady=10)
         # user_management_button = Button(sidebar_frame, fg='#fff', text="Quản lý người dùng", command=self.manage_users,bg='#108690',height=2)
         # user_management_button.pack(side='top', fill='x', pady=10)
@@ -97,7 +180,8 @@ class adminPage:
         # book_management_button.pack(side='top', fill='x', pady=10)
         # book_management_button = Button(sidebar_frame,  fg='#fff',text="Quản lý nhà xuất bản", command=self.manage_books,bg='#108690',height=2)
         # book_management_button.pack(side='top', fill='x', pady=10)
-        manage_button = Button(sidebar_frame, fg='#fff', text="Quản lý", command=self.manage_options, bg='#108690', height=2)
+       
+        manage_button = Button(sidebar_frame, fg='#fff', text="Quản lý", command=self.manage_options, bg='#108690', height=2, activebackground='#8865ff',activeforeground="#fff")
         manage_button.pack(side='top', fill='x', pady=10)
 
     def create_header(self):
@@ -249,7 +333,13 @@ class adminPage:
     def clear_main_content(self):
         for widget in self.main_frame.winfo_children():
                         widget.destroy()
+
     def replace_password(self):
+        if self.change_password_window is not None and self.change_password_window.winfo_exists():
+            # If the window already exists, just bring it to the front
+            self.change_password_window.deiconify()
+            self.change_password_window.lift()
+            return
         self.change_password_window = Toplevel(self.window)  # Create as a child of adminPage
         window_width = 350
         window_height = 350
@@ -290,12 +380,19 @@ class adminPage:
                          cursor='hand2', activebackground='#000181')
         update_pass.place(x=40, y=255, width=256, height=50)
         
+
         def close_window():
-            self.change_password_window.destroy()  # Trì hoãn đóng cửa sổ 100 mili giây
+            self.close_change_password_window()
+
             
 
         self.change_password_window.protocol("WM_DELETE_WINDOW", close_window)
-
+    def close_change_password_window(self):
+        # This method gets called when the change password window is closed
+        self.change_password_window.withdraw()  # Hide the window instead of destroying it
+        self.settings_button_text.set('Cài đặt ▼')  # Reset the button text
+        self.change_password_window = None  # Reset the window reference
+        
 
     def change_password_inFile(self, old_pass_entry, new_pass_entry,error_message_label):
         old_pass = old_pass_entry.get()
