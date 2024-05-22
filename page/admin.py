@@ -651,6 +651,8 @@ class adminPage:
         # Corrected lines: replaced `book_table` with `user_table` here
         self.user_table.table_frame.pack(side=LEFT, fill=BOTH, expand=True)
         self.user_table.edit_card_frame.pack(side=LEFT, fill=Y)
+
+        
     def select_image():
         file_path = filedialog.askopenfilename(initialdir="/", title="Select file",
                                             filetypes=(("jpeg files", "*.jpg"),

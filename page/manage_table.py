@@ -248,17 +248,22 @@ class ManageTable:
     def clear_edit_card(self):
         for entry in self.entries:
             entry.delete(0, END)
+        if self.allow_images:
+            self.img_label.config(image="")  # Set image to an empty string
+            self.img_label.image = None    # Remove the reference to the image
+        self.selected_index=None
     def add_record(self):
-        # Get data from entry fields
         new_data = [entry.get() for entry in self.entries]
 
-        # Add new record to self.data
+        # Create a new dictionary for the record
+        new_record = dict(zip(self.columns, new_data))
+
+        # If allow_images is True, add the image path to the new record
         if self.allow_images:
-            # Get the image path from the entry and add it to the new_data dictionary
-            image_path = self.img_path_entry.get()
-            self.data.append({**dict(zip(self.columns, new_data)), 'image_path': image_path})
-        else:
-            self.data.append(dict(zip(self.columns, new_data)))
+            new_record['image_path'] = self.img_path_entry.get()
+
+        # Append the new record to self.data
+        self.data.append(new_record)
 
         # Save to JSON file
         self.save_data()
@@ -337,9 +342,21 @@ class ManageTable:
             label = Label(self.edit_card_frame, text=col,font=23,foreground="#6699CC",background="#696969")
             label.grid(row=i, column=0, padx=5, pady=5, sticky="w") # Align label to the west
             self.labels.append(label)
-            entry = Entry(self.edit_card_frame,highlightthickness=2, relief=FLAT, fg="#6b6a69",insertbackground = '#6b6a69')
-            entry.grid(row=i, column=1, padx=5, pady=5)
-            self.entries.append(entry)
+
+            if col == 'type':
+                # Create a dropdown menu for 'type' column
+                type_options = ["user", "admin"]
+                selected_type = tk.StringVar(self.edit_card_frame)
+                selected_type.set(type_options[0])  # Set default value
+
+                entry = ttk.Combobox(self.edit_card_frame, textvariable=selected_type, values=type_options)
+                entry.grid(row=i, column=1, padx=5, pady=5)
+                self.entries.append(entry)
+            else:
+                # Use Entry for other columns
+                entry = Entry(self.edit_card_frame,highlightthickness=2, relief=FLAT, fg="#6b6a69",insertbackground = '#6b6a69')
+                entry.grid(row=i, column=1, padx=5, pady=5)
+                self.entries.append(entry)
 
         if self.allow_images:
             self.img_path_entry = self.entries[self.columns.index('image_path')]
@@ -373,46 +390,29 @@ class ManageTable:
                               bg='#4cb5f5', font=("Poppins SemiBold", 10, "bold"), bd=0,
                               fg='#fff', cursor='hand2', activebackground='#4cb5f5', activeforeground='#ffffff',  width=10 ,height=2)
         self.button6.grid(row=len(self.columns)+3, column=1, padx=5, pady=5, sticky="ew")    
+ 
+
     # def save_data(self):
-        
-    #     if self.selected_index is None:
-    #         print(self.data,"data")
-    #         with open(self.data_file, 'w', encoding='utf-8') as f:
-    #             json.dump({self.data_key: self.data}, f)
-
-
-    #         self.populate_table()
-    #         self.clear_edit_card()
-
-    #         return
-
-    #     new_data = [entry.get() for entry in self.entries]
-        
-    #     print(self.selected_index,"index")
-    #     self.data[self.selected_index] = dict(zip(self.columns, new_data))
-    #     print(self.data,"data")
-
+    #     # Always write the current state of data to file, regardless of whether it's an update or delete
     #     with open(self.data_file, 'w', encoding='utf-8') as f:
     #         json.dump({self.data_key: self.data}, f)
-
-
-    #     self.populate_table()
-    #     self.clear_edit_card()
+        
+    #     # If an update is performed, retrieve the updated data and apply it
+    #     if self.selected_index is not None:
+    #         updated_data = [entry.get() for entry in self.entries]
+    #         self.data[self.selected_index] = dict(zip(self.columns, updated_data))
+            
+    #         # After updating the internal data structure, save to file to persist changes
+    #         with open(self.data_file, 'w', encoding='utf-8') as f:
+    #             json.dump({self.data_key: self.data}, f)
     def save_data(self):
         # Always write the current state of data to file, regardless of whether it's an update or delete
         with open(self.data_file, 'w', encoding='utf-8') as f:
             json.dump({self.data_key: self.data}, f)
-        
-        # If an update is performed, retrieve the updated data and apply it
-        if self.selected_index is not None:
-            updated_data = [entry.get() for entry in self.entries]
-            self.data[self.selected_index] = dict(zip(self.columns, updated_data))
-            
-            # After updating the internal data structure, save to file to persist changes
-            with open(self.data_file, 'w', encoding='utf-8') as f:
-                json.dump({self.data_key: self.data}, f)
+
+        # Reset selected_index after saving (important for both add and update)
+        self.selected_index = None
 
         # Refresh the view to reflect changes
         self.populate_table()
         self.clear_edit_card()
-# Liên kết sự kiện click vào dòng
