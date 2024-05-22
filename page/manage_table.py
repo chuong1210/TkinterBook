@@ -405,6 +405,11 @@ class ManageTable:
     #         # After updating the internal data structure, save to file to persist changes
     #         with open(self.data_file, 'w', encoding='utf-8') as f:
     #             json.dump({self.data_key: self.data}, f)
+
+
+
+
+    
     def save_data(self):
         # Always write the current state of data to file, regardless of whether it's an update or delete
         with open(self.data_file, 'w', encoding='utf-8') as f:
