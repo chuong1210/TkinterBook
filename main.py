@@ -1,7 +1,7 @@
 import tkinter as tk
 from tkinter import Frame, Label, font, PhotoImage
-from PIL import ImageTk, Image
-from LoginPage import page  # Assuming this is your login page module
+from PIL import ImageTk, Image,ImageDraw
+from LoginPage import run_login  # Assuming this is your login page module
 import time
 from tkinter import Canvas
 
@@ -27,73 +27,96 @@ def new_win():
 # Background frame
 Frame(w, width=487, height=270, bg='#9999FF').place(x=0, y=0)
 
-# Thesis name label
-name_thesis = Label(w, text='HUIT CHƯƠNG', fg='white', bg='#9999FF')
-name_thesis.configure(font=("Game Of Squids", 26, "bold"))
-name_thesis.place(x=120, y=90)
-
-# Loading label
-Loading_lb = Label(w, text='Loading...', fg='white', bg='#9999FF')
-Loading_lb.configure(font=("Calibri", 14))
-Loading_lb.place(x=30, y=215)
-
 # Load images
-img_load1 = ImageTk.PhotoImage(Image.open('images\\c2.png'))
-img_load2 = ImageTk.PhotoImage(Image.open('images\\c1.png'))
+img_load1 = ImageTk.PhotoImage(Image.open('images\\point2.png'))
+img_load2 = ImageTk.PhotoImage(Image.open('images\\point1.png'))
 
+# Function to create a circular image label
+def create_circular_image_label(image, x, y, bg_color='#9999FF'):
+    # Resize the image to be smaller for the circle
+    image = image.resize((70, 70), Image.LANCZOS) 
+    
+    # Create a circular mask
+    mask = Image.new("L", image.size, 0)
+    draw = ImageDraw.Draw(mask)
+    draw.ellipse((0, 0, image.width, image.height), fill=255)
 
+    # Apply the mask to the image
+    masked_image = Image.new("RGBA", image.size)
+    masked_image.paste(image, (0, 0), mask)
+    masked_image_tk = ImageTk.PhotoImage(masked_image)
+
+    label = Label(w, image=masked_image_tk, bg=bg_color, borderwidth=0)
+    label.image = masked_image_tk
+    label.place(x=x, y=y)
+    return label
 # Function to create a label with border color matching the text
 def create_image_label(image, x, y, bg_color='#9999FF'):
     canvas = Canvas(w, width=image.width(), height=image.height(), bg=bg_color)
     canvas.create_image(image.width() // 2, image.height() // 2, image=image)
-    canvas.place(x=x-10, y=y)
+    canvas.place(x=x - 10, y=y)
     return canvas
+
+# Thesis name label with circular image
+name_thesis = Label(w, text='HUIT CHƯƠNG', fg='white', bg='#9999FF')
+name_thesis.configure(font=("Game Of Squids", 26, "bold"))
+name_thesis.place(x=117, y=90)
+
+# Add the circular image next to the label
+profile_image = Image.open('images\\CHUONG.png') # Replace with your image path
+profile_label = create_circular_image_label(profile_image, 200, 20) 
+
+# Loading label
+Loading_lb = Label(w, text='Loading...', fg='white', bg='#9999FF')
+Loading_lb.configure(font=("Time", 14))
+Loading_lb.place(x=370, y=215)
+
 # Animation function
 def animate():
     # Create labels with border color matching the text
-    l1 = create_image_label(img_load1, 180, 145, bg_color='#9999FF')
-    l2 = create_image_label(img_load2, 200, 145, bg_color='#9999FF')
-    l3 = create_image_label(img_load2, 220, 145, bg_color='#9999FF')
-    l4 = create_image_label(img_load2, 240, 145, bg_color='#9999FF')
-    l5 = create_image_label(img_load2, 260, 145, bg_color='#9999FF')
+    l1 = create_image_label(img_load1, 200, 145, bg_color='#9999FF')
+    l2 = create_image_label(img_load2, 220, 145, bg_color='#9999FF')
+    l3 = create_image_label(img_load2, 240, 145, bg_color='#9999FF')
+    l4 = create_image_label(img_load2, 260, 145, bg_color='#9999FF')
+    l5 = create_image_label(img_load2, 280, 145, bg_color='#9999FF')
 
 
     w.update_idletasks()
     time.sleep(0.5)
 
-    l1 = create_image_label(img_load2, 180, 145, bg_color='#9999FF')
-    l2 = create_image_label(img_load1, 200, 145, bg_color='#9999FF')
-    l3 = create_image_label(img_load2, 220, 145, bg_color='#9999FF')
-    l4 = create_image_label(img_load2, 240, 145, bg_color='#9999FF')
-    l5 = create_image_label(img_load2, 260, 145, bg_color='#9999FF')
+    l1 = create_image_label(img_load2, 200, 145, bg_color='#9999FF')
+    l2 = create_image_label(img_load1, 220, 145, bg_color='#9999FF')
+    l3 = create_image_label(img_load2, 240, 145, bg_color='#9999FF')
+    l4 = create_image_label(img_load2, 260, 145, bg_color='#9999FF')
+    l5 = create_image_label(img_load2, 280, 145, bg_color='#9999FF')
 
     w.update_idletasks()
     time.sleep(0.5)
 
-    l1 = create_image_label(img_load2, 180, 145, bg_color='#9999FF')     
-    l2 = create_image_label(img_load2, 200, 145, bg_color='#9999FF')
-    l3 = create_image_label(img_load1, 220, 145, bg_color='#9999FF')
-    l4 = create_image_label(img_load2, 240, 145, bg_color='#9999FF')
-    l5 = create_image_label(img_load2, 260, 145, bg_color='#9999FF')
+    l1 = create_image_label(img_load2, 200, 145, bg_color='#9999FF')     
+    l2 = create_image_label(img_load2, 220, 145, bg_color='#9999FF')
+    l3 = create_image_label(img_load1, 240, 145, bg_color='#9999FF')
+    l4 = create_image_label(img_load2, 260, 145, bg_color='#9999FF')
+    l5 = create_image_label(img_load2, 280, 145, bg_color='#9999FF')
 
     w.update_idletasks()
     time.sleep(0.5)
 
-    l1 = create_image_label(img_load2, 180, 145, bg_color='#9999FF')
-    l2 = create_image_label(img_load2, 200, 145, bg_color='#9999FF')
-    l3 = create_image_label(img_load2, 220, 145, bg_color='#9999FF')
-    l4 = create_image_label(img_load1, 240, 145, bg_color='#9999FF')
-    l5 = create_image_label(img_load2, 260, 145, bg_color='#9999FF')
+    l1 = create_image_label(img_load2, 200, 145, bg_color='#9999FF')
+    l2 = create_image_label(img_load2, 220, 145, bg_color='#9999FF')
+    l3 = create_image_label(img_load2, 240, 145, bg_color='#9999FF')
+    l4 = create_image_label(img_load1, 260, 145, bg_color='#9999FF')
+    l5 = create_image_label(img_load2, 280, 145, bg_color='#9999FF')
 
     w.update_idletasks()
     time.sleep(0.5)
 
     
-    l1 = create_image_label(img_load2, 180, 145, bg_color='#9999FF')
-    l2 = create_image_label(img_load2, 200, 145, bg_color='#9999FF')
-    l3 = create_image_label(img_load2, 220, 145, bg_color='#9999FF')
-    l4 = create_image_label(img_load2, 240, 145, bg_color='#9999FF')
-    l5 = create_image_label(img_load1, 260, 145, bg_color='#9999FF')
+    l1 = create_image_label(img_load2, 200, 145, bg_color='#9999FF')
+    l2 = create_image_label(img_load2, 220, 145, bg_color='#9999FF')
+    l3 = create_image_label(img_load2, 240, 145, bg_color='#9999FF')
+    l4 = create_image_label(img_load2, 260, 145, bg_color='#9999FF')
+    l5 = create_image_label(img_load1, 280, 145, bg_color='#9999FF')
 
     w.update_idletasks()
     time.sleep(0.5)
@@ -107,7 +130,7 @@ def animate():
 
     # Open the login page after animation
     w.destroy()
-    page()
+    run_login()
 
 # Start the animation
 animate()

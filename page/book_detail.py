@@ -50,8 +50,11 @@ class BookDetailWindow:
 
         # Nếu dữ liệu từ JSON, hiển thị nút đọc
         if is_Owner == 'json':
-            read_button = Button(self.window, text="Đọc", command=lambda: self.open_read_page(book_info, on_read_callback))
-            read_button.pack()
+            read_button = Button(self.window, text="Đọc", command=lambda: self.open_read_page(book_info, on_read_callback),font=("Poppins SemiBold", 13, "bold"), bd=0,
+                                            fg='#fff',
+                                        cursor='hand2', activebackground='#E6E6FA', activeforeground='#6495ED',bg='#6495ED')
+            read_button.pack(side='bottom', pady=10)
+
         
 
  

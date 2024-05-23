@@ -6,8 +6,8 @@ from PIL import ImageTk, Image,ImageDraw
 import json
 import requests
 from io import BytesIO
-from book_detail import BookDetailWindow
-from manage_table import ManageTable
+from .book_detail import BookDetailWindow
+from .manage_table import ManageTable
 import threading
 from time import sleep
 from tkinter import filedialog
@@ -15,6 +15,8 @@ from bs4 import BeautifulSoup
 from tkinter import scrolledtext
 from gtts import gTTS
 import os
+from tkinter import colorchooser
+
 import re
 
 
@@ -128,7 +130,7 @@ class adminPage:
             self.avatar_label.image = self.avatar_img 
 
     def create_sidebar(self):
-        sidebar_frame = Frame(self.window, width=200, bg='#108690')
+        sidebar_frame = Frame(self.window, width=200, bg='#00BFFF')
         #sidebar_frame.grid(row=1, column=0, sticky='ns')
         #sidebar_frame.pack(fill='y', side='left')
         sidebar_frame.place(relheight=1, relwidth=0.09)
@@ -155,7 +157,7 @@ class adminPage:
         self.pil_image = Image.composite(self.pil_image, Image.new("RGBA", (new_width, new_height), 0), mask)
 # Tạo mặt nạ hình tròn để hình ảnh
         self.avatar_img = ImageTk.PhotoImage(self.pil_image)  
-        self.avatar_label = Label(sidebar_frame, image=self.avatar_img, bg='#108690',cursor='hand1')
+        self.avatar_label = Label(sidebar_frame, image=self.avatar_img, bg='#00BFFF',cursor='hand1')
         self.avatar_label.image = self.avatar_img  # Lưu hình ảnh để tránh bị Python hủy
         self.avatar_label.pack(side='top', pady=10)
         self.avatar_label.bind("<Enter>", self.show_camera)
@@ -163,30 +165,30 @@ class adminPage:
         self.avatar_label.bind("<Button-1>", self.change_avatar)            # Bắt sự kiện hover và click
 
         settings_menu = Menu(self.window, tearoff=0)
-        self.home_button = Button(sidebar_frame, fg='#fff', text="Trang chủ", command=self.create_main_content, bg='#108690', height=2,activebackground='#8865ff',activeforeground="#fff")
+        self.home_button = Button(sidebar_frame, fg='#fff', text="Trang chủ", command=self.create_main_content, bg='#00BFFF', height=2,activebackground='#8865ff',activeforeground="#fff")
         self.home_button.pack(side='top', fill='x', pady=10)
-        settings_menu.add_command(label="Đổi mật khẩu", command=self.replace_password,background='#108690')
-        settings_menu.add_command(label="Xem thông tin tài khoản", command=self.view_account_info)
+        settings_menu.add_command(label="Đổi mật khẩu", command=self.replace_password,background='#00BFFF')
+        settings_menu.add_command(label="Xem thông tin tài khoản", command=self.view_account_info,background="#00BFFF")
 
         self.settings_button_text = StringVar()
         self.settings_button_text.set('Cài đặt ▼') 
         sidebar_frame.grid_columnconfigure(0, weight=1)  # Cần thiết để các nút mở rộng khi cửa sổ được chỉnh kích thước
 
-        settings_button = Button(sidebar_frame, fg='#fff',textvariable=self.settings_button_text, command=lambda: self.settings_menu_show_hide(settings_menu, settings_button),bg='#108690',height=2,activebackground='#8865ff',activeforeground="#fff")
+        settings_button = Button(sidebar_frame, fg='#fff',textvariable=self.settings_button_text, command=lambda: self.settings_menu_show_hide(settings_menu, settings_button),bg='#00BFFF',height=2,activebackground='#8865ff',activeforeground="#fff")
         settings_button.pack(side='top', fill='x', pady=10)
-        # user_management_button = Button(sidebar_frame, fg='#fff', text="Quản lý người dùng", command=self.manage_users,bg='#108690',height=2)
+        # user_management_button = Button(sidebar_frame, fg='#fff', text="Quản lý người dùng", command=self.manage_users,bg='#00BFFF',height=2)
         # user_management_button.pack(side='top', fill='x', pady=10)
-        # book_management_button = Button(sidebar_frame,  fg='#fff',text="Quản lý sách", command=self.manage_books,bg='#108690',height=2)
+        # book_management_button = Button(sidebar_frame,  fg='#fff',text="Quản lý sách", command=self.manage_books,bg='#00BFFF',height=2)
         # book_management_button.pack(side='top', fill='x', pady=10)
-        # book_management_button = Button(sidebar_frame,  fg='#fff',text="Quản lý nhà xuất bản", command=self.manage_books,bg='#108690',height=2)
+        # book_management_button = Button(sidebar_frame,  fg='#fff',text="Quản lý nhà xuất bản", command=self.manage_books,bg='#00BFFF',height=2)
         # book_management_button.pack(side='top', fill='x', pady=10)
        
-        manage_button = Button(sidebar_frame, fg='#fff', text="Quản lý", command=self.manage_options, bg='#108690', height=2, activebackground='#8865ff',activeforeground="#fff")
+        manage_button = Button(sidebar_frame, fg='#fff', text="Quản lý", command=self.manage_options, bg='#00BFFF', height=2, activebackground='#8865ff',activeforeground="#fff")
         manage_button.pack(side='top', fill='x', pady=10)
 
     def create_header(self):
 # tạo header frame
-        header_frame = Frame(self.window, height=200, bg='#108690')
+        header_frame = Frame(self.window, height=200, bg='#00BFFF')
         #header_frame.pack(fill='x')
         header_frame.place(rely=0, relx=0.09, relwidth=0.92, relheight=0.12)
 
@@ -206,11 +208,15 @@ class adminPage:
         book_genre_optionmenu.pack(side='left', padx=10)
 
         # tạo hộp nhập vào cho tìm kiếm sách
-        book_search_entry = Entry(header_frame)
+        book_search_entry = Entry(header_frame, fg="#a7a7a7", font=("arial semibold", 12), highlightthickness=2,cursor="hand2",width=30)    
         book_search_entry.pack(side='left', padx=10)
+        book_search_entry.insert(0,"Nhập tên sách...") # giữ nguyên
+        book_search_entry.bind("<FocusIn>", lambda args: book_search_entry.delete('0', 'end'))
         
         search_button = Button(header_frame, text="Tìm kiếm sách", 
-                               command=lambda: self.threaded_function(book_search_entry))
+                               command=lambda: self.threaded_function(book_search_entry),bg='#6495ED', font=("Poppins SemiBold", 13, "bold"), bd=0,
+                                            fg='#fff',
+                                        cursor='hand2', activebackground='#E6E6FA', activeforeground='#6495ED',)
         search_button.pack(side='left', padx=10)
         
         # self.button6 = Button(header_frame)
@@ -226,18 +232,68 @@ class adminPage:
         # self.button6.configure(text="""Đăng xuất""")
         # self.button6.configure(command=self.exit)
         greeting_text = f"Xin chào, { self.current_user['username']}"
-        self.greeting_label = Label(header_frame, text=greeting_text, bg='#108690', fg='white', font=("Poppins SemiBold", 15, "bold"))
+        self.greeting_label = Label(header_frame, text=greeting_text, bg='#00BFFF', fg='white', font=("Poppins SemiBold", 15, "bold"))
         self.greeting_label.place(x=990, y=38)
 
-        logout_button = Button(header_frame, text='Logout', bg='#4cb5f5', font=("Poppins SemiBold", 13, "bold"), bd=0,
+        logout_button = Button(header_frame, text='Logout', bg='#6495ED', font=("Poppins SemiBold", 13, "bold"), bd=0,
                                             fg='#fff',
-                                        cursor='hand2', activebackground='#4cb5f5', activeforeground='#ffffff',
+                                        cursor='hand2', activebackground='#E6E6FA', activeforeground='#6495ED',
                                        command=self.exit)
         logout_button.place(relx=0.88, rely=0.300, width=96, height=45)
-
     def view_account_info(self):
-    # Code to view account info goes here
-         pass
+        if self.change_password_window is not None and self.change_password_window.winfo_exists():
+            # Nếu cửa sổ đã tồn tại, chỉ cần đưa nó lên phía trước
+            self.change_password_window.deiconify()
+            self.change_password_window.lift()
+            return
+        self.change_password_window = Toplevel(self.window)  # Create as a child of adminPage
+        window_width = 350
+        window_height = 400 #Tăng kích thước cửa sổ
+        s_width = self.change_password_window.winfo_screenwidth()
+        s_height = self.change_password_window.winfo_screenheight()
+        p_top = int(s_height / 4 - window_height / 4)
+        p_right = int(s_width / 2 - window_width / 2)
+        self.change_password_window.geometry(f'{window_width}x{window_height}+{p_right}+{p_top}')
+        self.change_password_window.title('Thông Tin Tài Khoản')
+        self.change_password_window.iconbitmap('images\\user.ico')
+        self.change_password_window.configure(background='#e6f2ff') # Thay đổi màu nền
+        self.change_password_window.resizable(0, 0)
+
+        # Hiển thị Avatar
+        avatar_path = self.current_user['image_path']  # Lấy đường dẫn ảnh từ user_info
+        try:
+            avatar_img = Image.open(avatar_path)
+        except FileNotFoundError:
+            # Sử dụng ảnh mặc định nếu không tìm thấy ảnh
+            avatar_img = Image.open('images\\CHUONG.png') 
+        
+        avatar_img = avatar_img.resize((100, 100))
+        avatar_photo = ImageTk.PhotoImage(avatar_img)
+        avatar_label = Label(self.change_password_window, image=avatar_photo, bg='#e6f2ff')
+        avatar_label.image = avatar_photo  # Giữ tham chiếu đến hình ảnh
+        avatar_label.place(x=125, y=10)
+
+        # Hiển thị thông tin người dùng
+        username_label = Label(self.change_password_window, text=f"Tên tài khoản: {self.current_user['username']}", bg='#e6f2ff', font=("arial", 14,"bold"))
+        username_label.place(x=40, y=130)
+
+        email_label = Label(self.change_password_window, text=f"Email: {self.current_user['email']}", bg='#e6f2ff', font=("arial", 14,"bold"))
+        email_label.place(x=40, y=170)
+
+        type_label = Label(self.change_password_window, text=f"Loại tài khoản: {self.current_user['type']}", bg='#e6f2ff', font=("arial", 14,"bold"))
+        type_label.place(x=40, y=210)
+
+        # Hiển thị ngày sinh
+        birthday_label = Label(self.change_password_window, text=f"Ngày sinh: {self.current_user.get('birthday', 'Chưa cập nhật')}", bg='#e6f2ff', font=("arial", 14,"bold"))
+        birthday_label.place(x=40, y=250)
+        
+
+        def close_window():
+            self.close_change_password_window()
+
+        self.change_password_window.protocol("WM_DELETE_WINDOW", close_window)
+            # Các thông tin khác (nếu có)
+            # ...
 
 
 
@@ -521,49 +577,80 @@ class adminPage:
             self.show_book_content(book_info)
         else:
             messagebox.showerror("Lỗi", "URL không hợp lệ.")
+    def choose_font_color(self):
+        # Mở hộp thoại chọn màu
+        color_code = colorchooser.askcolor(title="Chọn màu chữ")[1]
+        if color_code:
+            # Định cấu hình thẻ cho nội dung được crawl với màu chữ mới
+            self.content_text.tag_configure('scraped_content', foreground=color_code)
+    def choose_background_color(self):
+        # Mở hộp thoại chọn màu
+        color_code = colorchooser.askcolor(title="Chọn màu nền")[1]
+        if color_code:
+            # Định cấu hình thẻ cho nội dung được crawl với màu nền mới
+            self.content_text.tag_configure('scraped_content', background=color_code)
     def show_book_content(self, book_info):
+            self.clear_main_content()
 
-        self.clear_main_content()
+            # Sử dụng một Text widget cho cả tiêu đề và nội dung
+            self.content_text = Text(self.main_frame, wrap='word', font=("Helvetica Neue", 20), background="#eeeeee")
+
+            # Insert the title into the Text widget
+            self.content_text.insert('1.0', book_info['title'] + "\n", 'title')
+            self.content_text.tag_configure('title', font=("Helvetica", 26), foreground="#fff", background="#00CDCD", justify="center", spacing1=10, spacing3=10)
+            self.content_text.tag_add("center", "1.0", "end")
+
+            if self.first_chapter >= 1:
+                chapter_label = Label(self.main_frame, text=f"Chương {self.first_chapter}", font=("Helvetica Neue", 16))
+                chapter_label.pack()
+
+            button_frame = Frame(self.main_frame)
+            button_frame.pack(side='top')
+
+            # Nút Chap trước
+            prev_chap_button = Button(button_frame, text="Chap trước", command=lambda: self.change_chap(book_info, -1))
+            prev_chap_button.pack(side='left', padx=5, pady=5)
+
+            # Nút Chap tiếp theo
+            next_chap_button = Button(button_frame, text="Chap tiếp theo", command=lambda: self.change_chap(book_info, 1))
+            next_chap_button.pack(side='left', padx=5, pady=5)
 
 
-        # Sử dụng một Text widget cho cả tiêu đề và nội dung
-        content_text = Text(self.main_frame, wrap='word', font=("Helvetica Neue", 20),background="#eeeeee")
-        
-        # Insert the title into the Text widget
-        content_text.insert('1.0', book_info['title'] + "\n", 'title')
-        content_text.tag_configure('title', font=("Helvetica", 26), foreground="#fff", background="#00CDCD",justify="center",spacing1=10 ,spacing3=10)
-        content_text.tag_add("center", "1.0", "end")
-        button_frame = Frame(self.main_frame)
-        button_frame.pack(side='top')
+            # Nút chọn màu
+            color_button = Button(button_frame, text="Chọn màu chữ", command=self.choose_font_color)
+            color_button.pack(side='left', padx=5, pady=5)
 
-        # Nút Chap trước
-        prev_chap_button = Button(button_frame, text="Chap trước", command=lambda: self.change_chap(book_info, -1))
-        prev_chap_button.pack(side='left', padx=5, pady=5)
+            background_color_button = Button(button_frame, text="Chọn màu nền", command=self.choose_background_color)
+            background_color_button.pack(side='left', padx=5, pady=5)
 
-        # Nút Chap tiếp theo
-        next_chap_button = Button(button_frame, text="Chap tiếp theo", command=lambda: self.change_chap(book_info, 1))
-        next_chap_button.pack(side='left', padx=5, pady=5)
-        content_url = book_info.get('content_url')
+            content_url = book_info.get('content_url')
 
-        if content_url:
-            
-            scraped_content = self.read_data(content_url)
-            if scraped_content:
-                # Thêm nội dung vào widget Text dưới tiêu đề
-                content_text.insert('end', "\n" + scraped_content)
+            if content_url:
+                scraped_content = self.read_data(content_url)
+                if scraped_content:
+                    # Định cấu hình thẻ cho nội dung được crawl
+                    self.content_text.tag_configure('scraped_content', background="#FFFFE0")  # Đổi màu nền thành #FFFFE0 (màu vàng nhạt)
+
+                    # Thêm nội dung vào widget Text dưới tiêu đề
+                    start_index = self.content_text.index('end')
+                    self.content_text.insert('end', "\n" + scraped_content, 'scraped_content')
+                    end_index = self.content_text.index('end')
+
+                    # Áp dụng thẻ cho toàn bộ đoạn nội dung được crawl
+                    self.content_text.tag_add('scraped_content', start_index, end_index)
+                else:
+                    self.content_text.insert('end', "\nError: Could not fetch book content.")
             else:
-                content_text.insert('end', "\nError: Could not fetch book content.")
-        else:
-            content_text.insert('end', "\nError: Book content URL not found.")
+                self.content_text.insert('end', "\nError: Book content URL not found.")
 
-        # Tạo Scrollbar và định cấu hình để nó hoạt động với widget Text
-        scrollbar = Scrollbar(self.main_frame, command=content_text.yview)
-        content_text['yscrollcommand'] = scrollbar.set
+            # Tạo Scrollbar và định cấu hình để nó hoạt động với widget Text
+            scrollbar = Scrollbar(self.main_frame, command=self.content_text.yview)
+            self.content_text['yscrollcommand'] = scrollbar.set
 
-        # Đóng gói Scrollbar và để Text widget cuộn được
-        scrollbar.pack(side='right', fill='y')
-        content_text.pack(side='left', expand=True, fill='both')
-        content_text.config(state='disabled')  # Disable editing of
+            # Đóng gói Scrollbar và để Text widget cuộn được
+            scrollbar.pack(side='right', fill='y')
+            self.content_text.pack(side='left', expand=True, fill='both')
+            self.content_text.config(state='disabled')  # Disable editing of content
 
 
     def display_all_books_json(self):
@@ -613,12 +700,12 @@ class adminPage:
             if len(title) > 40:  # Cắt tiêu đề nếu quá dài
                 title = title[:37] + "..."
             author = book['authors']
-            info_label = Label(book_frame, text=f"{title}\nAuthor: {author}", justify=LEFT)
+            info_label = Label(book_frame, text=f"{title}\nTác giả: {author}", justify=CENTER)
 
             info_label.pack()
 
             column += 1
-            if column == 5:
+            if column == 8:
                 column = 0
                 row += 1
 # def logout():
@@ -643,7 +730,7 @@ class adminPage:
         # Close the book detail window when it is closed
     def manage_users(self):
         self.clear_main_content()
-        user_columns = ("username", "password","type","email","image_path")
+        user_columns = ("username", "password","type","email","image_path","birthday")
         self.user_table = ManageTable(self.main_frame, "json_file\\users_detail.json", "users", user_columns,"Độc gia",True)
         intermediate_frame = Frame(self.main_frame)
         intermediate_frame.pack(fill=BOTH, expand=True)

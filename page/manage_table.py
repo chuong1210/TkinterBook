@@ -220,7 +220,7 @@ class ManageTable:
 
         # Thêm dữ liệu vào table
         for item in self.data:
-            values = [item[col] for col in self.columns]
+            values = [item.get(col, "") for col in self.columns]  # Use get() with default value
             self.table.insert("", END, values=values, tags=("clickable",))
 
         self.table.tag_bind("clickable", "<ButtonRelease-1>", self.on_row_click)    # ... (code hiện tại) ...
@@ -262,6 +262,8 @@ class ManageTable:
         if self.allow_images:
             new_record['image_path'] = self.img_path_entry.get()
 
+        if 'birthday' in self.columns and 'birthday' not in new_record:
+            new_record['birthday'] = ""  # Or any default value 
         # Append the new record to self.data
         self.data.append(new_record)
 

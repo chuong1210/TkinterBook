@@ -6,7 +6,9 @@ from page.admin import run_admin
 from tkinter import *
 from PIL import ImageTk, Image, ImageDraw
 import json
+from  tkcalendar import DateEntry
 import re
+from tkinter import messagebox       
 
 with open('json_file\\users_detail.json') as f:
     user_data = json.load(f)
@@ -118,7 +120,7 @@ class LoginPage:
 
             self.username_entry = Entry(self.lgn_frame, highlightthickness=0, relief=FLAT, bg="#1974d3", fg="#6b6a69",
                                         font=("Roboto ", 12, "bold"), insertbackground='#6b6a69')
-            self.username_entry.place(x=580, y=335, width=270)
+            self.username_entry.place(x=580, y=330, width=270)
 
             self.username_line = Canvas(self.lgn_frame, width=300, height=2.0, bg="#ffcc98", highlightthickness=0)
             self.username_line.place(x=550, y=359)
@@ -274,12 +276,23 @@ class LoginPage:
 
         self.password_label = Label(self.lgn_frame, text="Password", bg="#1974d3", fg="#4f4e4d",
                                     font=("Roboto", 13, "bold"))
-        self.password_label.place(x=550, y=410)
+        self.password_label.place(x=550, y=395)
         self.password_entry = Entry(self.lgn_frame, highlightthickness=0, relief=FLAT, bg="#1974d3", fg="#6b6a69",
                                     font=("Roboto", 12, "bold"), show="*", insertbackground='#6b6a69')
-        self.password_entry.place(x=550, y=435, width=270)
+        self.password_entry.place(x=550, y=420, width=270)
         self.password_line = Canvas(self.lgn_frame, width=270, height=2.0, bg="#ffcc98", highlightthickness=0)
-        self.password_line.place(x=550, y=460)
+        self.password_line.place(x=550, y=445)
+        self.birthday_label = Label(self.lgn_frame, text="Birthday", bg="#fff", fg="#4f4e4d",
+                                    font=("Roboto", 13, "bold"))
+        self.birthday_label.place(x=558, y=460)
+
+        self.birthday_entry = DateEntry(self.lgn_frame, 
+                                        date_pattern='dd/MM/yyyy',  # Set date format
+                                        width=18,
+                                        background='darkblue',
+                                        foreground='white',
+                                        borderwidth=3)
+        self.birthday_entry.place(x=650, y=460) 
 
         self.signup_button = Button(self.lgn_frame, text='Sign Up', command=self.signup_function, font=("Roboto", 14, "bold"), width=25, bd=0,
                             bg='#3047ff', cursor='hand2', activebackground='#8865ff', fg='white')
@@ -289,8 +302,8 @@ class LoginPage:
                             bg='#3047ff', cursor='hand2', activebackground='#8865ff', fg='white')
         self.back_to_login_button.place(x=535, y=555)
 
-        self.error_message_label = Label(self.lgn_frame, text='', bg="#1974d3")
-        self.error_message_label.place(x=550, y=470)
+        self.error_message_label = Label(self.lgn_frame, text='', bg="#1974d3", font=("Times", 24, "bold"))
+        self.error_message_label.place(x=80, y=470)
 
     def back_to_login_function(self):
         self.is_login_mode=True
@@ -300,16 +313,22 @@ class LoginPage:
         new_username = self.username_entry.get()
         new_email = self.email_entry.get()
         new_password = self.password_entry.get()
+        birthday = self.birthday_entry.get_date().strftime('%d/%m/%Y')  
 
         # Kiểm tra định dạng email
         if not re.match(r"[^@]+@[^@]+\.[^@]+", new_email):
-            self.error_message_label.config(text='Invalid email format.', fg='red')
+            self.error_message_label.config(text='Email không đúng định dạng.', fg='red')
             return
-
+        if not new_username:
+            self.error_message_label.config(text='Vui lòng nhập username.', fg='red')
+            return
+        if not new_password:
+            self.error_message_label.config(text='Vui lòng nhập password.', fg='red')
+            return
         # Kiểm tra xem username đã tồn tại chưa
         for user_info in user_data['users']:
             if user_info['username'] == new_username:
-                self.error_message_label.config(text='Username already exists.', fg='red')
+                self.error_message_label.config(text='Username đã tồn tại.', fg='red')
                 return
 
         # Thêm người dùng mới vào dữ liệu JSON
@@ -318,7 +337,8 @@ class LoginPage:
             "password": new_password,
             "email": new_email,
             "type": "user",
-            "path_avatar": "images\\CHUONG.png"
+            "image_path": "images\\CHUONG.png",
+            "birthday":birthday
         }
         user_data['users'].append(new_user)
         with open('json_file\\users_detail.json', 'w') as f:
@@ -326,8 +346,7 @@ class LoginPage:
         self.username_entry.delete(0, END)  # Delete all text in username entry
         self.email_entry.delete(0, END)    # Delete all text in email entry
         self.password_entry.delete(0, END)  # Delete all text in password entry
-        self.error_message_label.config(text='Registration successful!', fg='green')
-     
+        messagebox.showinfo("Success", "Đăng kí thành công") 
 
     def show(self):
         self.hide_button = Button(self.lgn_frame, image=self.hide_image, command=self.hide, relief=FLAT,
