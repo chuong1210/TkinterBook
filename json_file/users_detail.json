@@ -1,1 +1,36 @@
-{"users": [{"username": "user1", "password": "password1", "type": "admin", "email": "user1@example.com", "image_path": "C:/Users/chuon/Downloads/14007psd.png", "birthday": "14/05/2024"}, {"username": "user3", "password": "password3", "type": "admin", "email": "user3@example.com", "image_path": "images/loading.png", "birthday": "14/05/2024"}, {"username": "user4", "password": "password4", "type": "user", "email": "user3@example.com", "image_path": "C:/Users/chuon/Downloads/spring.png", "birthday": "14/05/2024"}, {"username": "3", "password": "3", "type": "admin", "email": "2222@gmail.com", "image_path": "C:/Users/chuon/Desktop/Book-store/images/publisher.png", "birthday": "10/12/2003"}, {"username": "a", "password": "a", "email": "dadsaQ@gmail.com", "type": "user", "image_path": "images\\CHUONG.png", "birthday": "23/05/2024"}]}
+{
+  "users": [
+    {
+      "username": "user1",
+      "password": "password1",
+      "type": "user",
+      "email": "user1@example.com",
+      "image_path": "C:/Users/chuon/Desktop/Book-store/images/username2.png",
+      "birthday": "14/05/2024"
+    },
+    {
+      "username": "user4",
+      "password": "password",
+      "type": "user",
+      "email": "user3@example.com",
+      "image_path": "C:/Users/chuon/Desktop/Book-store/images/username2.png",
+      "birthday": "14/05/2024"
+    },
+    {
+      "username": "user3",
+      "password": "password3",
+      "type": "admin",
+      "email": "2222@gmail.com",
+      "image_path": "C:/Users/chuon/Desktop/Book-store/images/huit.png",
+      "birthday": "10/12/2003"
+    },
+    {
+      "username": "user5",
+      "password": "password5",
+      "email": "user5@gmail.com",
+      "type": "user",
+      "image_path": "images\\backgroundbook.jpg",
+      "birthday": "07/05/2004"
+    }
+  ]
+}

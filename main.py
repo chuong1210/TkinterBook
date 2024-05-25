@@ -4,13 +4,13 @@ from PIL import ImageTk, Image,ImageDraw
 from LoginPage import run_login  # Assuming this is your login page module
 import time
 from tkinter import Canvas
-
+import os
 # Create the main window
 w = tk.Tk()
 
 # Window dimensions and positioning
 width_of_window = 477
-height_of_window = 280
+height_of_window = 285
 screen_width = w.winfo_screenwidth()
 screen_height = w.winfo_screenheight()
 x_coordinate = (screen_width / 2) - (width_of_window / 2)
@@ -28,8 +28,8 @@ def new_win():
 Frame(w, width=487, height=270, bg='#9999FF').place(x=0, y=0)
 
 # Load images
-img_load1 = ImageTk.PhotoImage(Image.open('images\\point2.png'))
-img_load2 = ImageTk.PhotoImage(Image.open('images\\point1.png'))
+img_load1 = ImageTk.PhotoImage(Image.open(os.path.join('images', 'point2.png')))
+img_load2 = ImageTk.PhotoImage(Image.open(os.path.join('images', 'point1.png')))
 
 # Function to create a circular image label
 def create_circular_image_label(image, x, y, bg_color='#9999FF'):
@@ -60,11 +60,11 @@ def create_image_label(image, x, y, bg_color='#9999FF'):
 # Thesis name label with circular image
 name_thesis = Label(w, text='HUIT CHƯƠNG', fg='white', bg='#9999FF')
 name_thesis.configure(font=("Game Of Squids", 26, "bold"))
-name_thesis.place(x=117, y=90)
+name_thesis.place(x=117, y=110)
 
 # Add the circular image next to the label
 profile_image = Image.open('images\\CHUONG.png') # Replace with your image path
-profile_label = create_circular_image_label(profile_image, 200, 20) 
+profile_label = create_circular_image_label(profile_image, 210, 20) 
 
 # Loading label
 Loading_lb = Label(w, text='Loading...', fg='white', bg='#9999FF')
@@ -74,49 +74,49 @@ Loading_lb.place(x=370, y=215)
 # Animation function
 def animate():
     # Create labels with border color matching the text
-    l1 = create_image_label(img_load1, 200, 145, bg_color='#9999FF')
-    l2 = create_image_label(img_load2, 220, 145, bg_color='#9999FF')
-    l3 = create_image_label(img_load2, 240, 145, bg_color='#9999FF')
-    l4 = create_image_label(img_load2, 260, 145, bg_color='#9999FF')
-    l5 = create_image_label(img_load2, 280, 145, bg_color='#9999FF')
+    l1 = create_image_label(img_load1, 205, 170, bg_color='#9999FF')
+    l2 = create_image_label(img_load2, 225, 170, bg_color='#9999FF')
+    l3 = create_image_label(img_load2, 245, 170, bg_color='#9999FF')
+    l4 = create_image_label(img_load2, 265, 170, bg_color='#9999FF')
+    l5 = create_image_label(img_load2, 285, 170, bg_color='#9999FF')
 
 
     w.update_idletasks()
     time.sleep(0.5)
 
-    l1 = create_image_label(img_load2, 200, 145, bg_color='#9999FF')
-    l2 = create_image_label(img_load1, 220, 145, bg_color='#9999FF')
-    l3 = create_image_label(img_load2, 240, 145, bg_color='#9999FF')
-    l4 = create_image_label(img_load2, 260, 145, bg_color='#9999FF')
-    l5 = create_image_label(img_load2, 280, 145, bg_color='#9999FF')
+    l1 = create_image_label(img_load2, 205, 170, bg_color='#9999FF')
+    l2 = create_image_label(img_load1, 225, 170, bg_color='#9999FF')
+    l3 = create_image_label(img_load2, 245, 170, bg_color='#9999FF')
+    l4 = create_image_label(img_load2, 265, 170, bg_color='#9999FF')
+    l5 = create_image_label(img_load2, 285, 170, bg_color='#9999FF')
 
     w.update_idletasks()
     time.sleep(0.5)
 
-    l1 = create_image_label(img_load2, 200, 145, bg_color='#9999FF')     
-    l2 = create_image_label(img_load2, 220, 145, bg_color='#9999FF')
-    l3 = create_image_label(img_load1, 240, 145, bg_color='#9999FF')
-    l4 = create_image_label(img_load2, 260, 145, bg_color='#9999FF')
-    l5 = create_image_label(img_load2, 280, 145, bg_color='#9999FF')
+    l1 = create_image_label(img_load2, 205, 170, bg_color='#9999FF')     
+    l2 = create_image_label(img_load2, 225, 170, bg_color='#9999FF')
+    l3 = create_image_label(img_load1, 245, 170, bg_color='#9999FF')
+    l4 = create_image_label(img_load2, 265, 170, bg_color='#9999FF')
+    l5 = create_image_label(img_load2, 285, 170, bg_color='#9999FF')
 
     w.update_idletasks()
     time.sleep(0.5)
 
-    l1 = create_image_label(img_load2, 200, 145, bg_color='#9999FF')
-    l2 = create_image_label(img_load2, 220, 145, bg_color='#9999FF')
-    l3 = create_image_label(img_load2, 240, 145, bg_color='#9999FF')
-    l4 = create_image_label(img_load1, 260, 145, bg_color='#9999FF')
-    l5 = create_image_label(img_load2, 280, 145, bg_color='#9999FF')
+    l1 = create_image_label(img_load2, 205, 170, bg_color='#9999FF')
+    l2 = create_image_label(img_load2, 225, 170, bg_color='#9999FF')
+    l3 = create_image_label(img_load2, 245, 170, bg_color='#9999FF')
+    l4 = create_image_label(img_load1, 265, 170, bg_color='#9999FF')
+    l5 = create_image_label(img_load2, 285, 170, bg_color='#9999FF')
 
     w.update_idletasks()
     time.sleep(0.5)
 
     
-    l1 = create_image_label(img_load2, 200, 145, bg_color='#9999FF')
-    l2 = create_image_label(img_load2, 220, 145, bg_color='#9999FF')
-    l3 = create_image_label(img_load2, 240, 145, bg_color='#9999FF')
-    l4 = create_image_label(img_load2, 260, 145, bg_color='#9999FF')
-    l5 = create_image_label(img_load1, 280, 145, bg_color='#9999FF')
+    l1 = create_image_label(img_load2, 205, 170, bg_color='#9999FF')
+    l2 = create_image_label(img_load2, 225, 170, bg_color='#9999FF')
+    l3 = create_image_label(img_load2, 245, 170, bg_color='#9999FF')
+    l4 = create_image_label(img_load2, 265, 170, bg_color='#9999FF')
+    l5 = create_image_label(img_load1, 285, 170, bg_color='#9999FF')
 
     w.update_idletasks()
     time.sleep(0.5)

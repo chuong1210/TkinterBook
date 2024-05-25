@@ -6,8 +6,8 @@ from PIL import ImageTk, Image,ImageDraw
 import json
 import requests
 from io import BytesIO
-from .book_detail import BookDetailWindow
-from .manage_table import ManageTable
+from page.book_detail import BookDetailWindow  
+from page.manage_table import ManageTable
 import threading
 from time import sleep
 from tkinter import filedialog
@@ -20,9 +20,15 @@ from tkinter import colorchooser
 import re
 
 
-colorBg="f0f8ff"
-with open('json_file\\users_detail.json') as f:
+json_file_path = os.path.join( 'json_file', 'users_detail.json')
+if os.path.exists(json_file_path):
+   with open(json_file_path, 'r') as f:
     user_data = json.load(f)
+else:
+    print(f"File not found at {json_file_path}")
+# Sử dụng json_file_path khi đọc file
+
+
 
 
 class adminPage:
@@ -41,6 +47,9 @@ class adminPage:
 
         self.main_frame = None
         self.change_password_window = None 
+        self.loading_img = ImageTk.PhotoImage(Image.open(os.path.join('images', 'loading.png')))
+        self.loading_label = Label(self.main_frame, image=self.loading_img)
+        self.loading_label.pack_forget()  # Initialize as hidden
 
         self.create_main_content()
         self.window.grid_rowconfigure(0, weight=0)  # Header không nên mở rộng khi cửa sổ được chỉnh kích thước
@@ -48,7 +57,7 @@ class adminPage:
         self.window.grid_columnconfigure(0, weight=0)  # Sidebar không nên mở rộng
         self.window.grid_columnconfigure(1, weight=1)  # Main frame nên mở rộng
         self.images = []
-        self.camera_icon_pil = Image.open('images//camera-icon.png').resize((20, 20)) # Sử dụng PIL
+        self.camera_icon_pil = Image.open(os.path.join('images', 'camera-icon.png')).resize((20, 20)) # Sử dụng PIL
         self.camera_icon = ImageTk.PhotoImage(self.camera_icon_pil)
 
 
@@ -74,8 +83,7 @@ class adminPage:
             self.pil_image = Image.open(avatar_path)
         except FileNotFoundError:
             # Sử dụng ảnh mặc định nếu không tìm thấy ảnh
-            self.pil_image = Image.open('images\\CHUONG.png') 
-    # Tải lại ảnh avatar
+            self.pil_image = Image.open(os.path.join('images', 'CHUONG.png'))    # Tải lại ảnh avatar
         self.pil_image = Image.open(avatar_path)
         width, height = self.pil_image.size
         new_width = width // 7
@@ -108,7 +116,8 @@ class adminPage:
             for user in user_data['users']:
                 if user['username'] == self.current_user['username']:
                     user['image_path'] = file_path
-            with open('json_file\\users_detail.json', 'w') as f:
+            json_file_path = os.path.join('json_file', 'users_detail.json')
+            with open(json_file_path, 'w') as f:
                 json.dump(user_data, f)
 
             # Tải lại ảnh avatar
@@ -133,6 +142,7 @@ class adminPage:
         sidebar_frame = Frame(self.window, width=200, bg='#00BFFF')
         #sidebar_frame.grid(row=1, column=0, sticky='ns')
         #sidebar_frame.pack(fill='y', side='left')
+    
         sidebar_frame.place(relheight=1, relwidth=0.09)
 
 
@@ -142,7 +152,7 @@ class adminPage:
             self.pil_image = Image.open(avatar_path)
         except FileNotFoundError:
             # Sử dụng ảnh mặc định nếu không tìm thấy ảnh
-            self.pil_image = Image.open('images\\CHUONG.png') 
+            self.pil_image = Image.open(os.path.join('images', 'CHUONG.png')) 
                        # Ảnh máy ảnh
   
         width, height = self.pil_image.size
@@ -208,13 +218,13 @@ class adminPage:
         book_genre_optionmenu.pack(side='left', padx=10)
 
         # tạo hộp nhập vào cho tìm kiếm sách
-        book_search_entry = Entry(header_frame, fg="#a7a7a7", font=("arial semibold", 12), highlightthickness=2,cursor="hand2",width=30)    
+        book_search_entry = Entry(header_frame, fg="#00BFFF", font=("arial semibold", 12), highlightthickness=2,cursor="hand2",width=30)    
         book_search_entry.pack(side='left', padx=10)
         book_search_entry.insert(0,"Nhập tên sách...") # giữ nguyên
         book_search_entry.bind("<FocusIn>", lambda args: book_search_entry.delete('0', 'end'))
         
         search_button = Button(header_frame, text="Tìm kiếm sách", 
-                               command=lambda: self.threaded_function(book_search_entry),bg='#6495ED', font=("Poppins SemiBold", 13, "bold"), bd=0,
+                               command=lambda: self.search_book(book_search_entry),bg='#6495ED', font=("Poppins SemiBold", 13, "bold"), bd=0,
                                             fg='#fff',
                                         cursor='hand2', activebackground='#E6E6FA', activeforeground='#6495ED',)
         search_button.pack(side='left', padx=10)
@@ -255,7 +265,7 @@ class adminPage:
         p_right = int(s_width / 2 - window_width / 2)
         self.change_password_window.geometry(f'{window_width}x{window_height}+{p_right}+{p_top}')
         self.change_password_window.title('Thông Tin Tài Khoản')
-        self.change_password_window.iconbitmap('images\\user.ico')
+        self.change_password_window.iconbitmap(os.path.join('images', 'user.ico'))
         self.change_password_window.configure(background='#e6f2ff') # Thay đổi màu nền
         self.change_password_window.resizable(0, 0)
 
@@ -265,7 +275,7 @@ class adminPage:
             avatar_img = Image.open(avatar_path)
         except FileNotFoundError:
             # Sử dụng ảnh mặc định nếu không tìm thấy ảnh
-            avatar_img = Image.open('images\\CHUONG.png') 
+            avatar_img = Image.open(os.path.join('images', 'CHUONG.png')) 
         
         avatar_img = avatar_img.resize((100, 100))
         avatar_photo = ImageTk.PhotoImage(avatar_img)
@@ -328,9 +338,10 @@ class adminPage:
             # Tạo main_frame mới nếu cần
             self.main_frame = Frame(self.window)
         self.main_frame.place(relx=0.093, rely=0.12, relwidth=0.912, relheight=0.845) 
+    
 
         # creating background image widget
-        self.bg_image = Image.open('images\\bgmain.jpg')
+        self.bg_image = Image.open(os.path.join('images', 'bgmain.jpg'))
         self.bg_photo_image = ImageTk.PhotoImage(self.bg_image)
         self.bg_label = Label(self.main_frame, image=self.bg_photo_image)
         self.bg_label.place(x=0, y=0, relwidth=0.99, relheight=0.845)
@@ -350,14 +361,14 @@ class adminPage:
     def manage_options(self):
         self.clear_main_content()
 
-        user_picture = Image.open("images\\user-icon.png")
+        user_picture = Image.open(os.path.join('images', 'user-icon.png'))
         user_picture = user_picture.resize((100, 100)) # giảm kích cỡ hình ảnh
         user_picture = ImageTk.PhotoImage(user_picture) 
         self.images.append(user_picture)
         Button(self.main_frame, image=self.images[-1], text='Quản lý người dùng',font='Verdana',
         compound=TOP, command=self.manage_users).place(relx=0.2, rely=0.3)
 
-        book_picture = Image.open("images\\book.png")
+        book_picture = Image.open(os.path.join('images', 'book.png'))
         book_picture = book_picture.resize((100, 100)) # giảm kích cỡ hình ảnh
         book_picture = ImageTk.PhotoImage(book_picture)
         self.images.append(book_picture)
@@ -365,7 +376,7 @@ class adminPage:
         compound=TOP, command=self.manage_books,height=200,width=200).place(relx=0.4, rely=0.3)
 
 
-        publisher_picture = Image.open("images\\publisher.png")
+        publisher_picture = Image.open(os.path.join('images', 'publisher.png'))
         publisher_picture = publisher_picture.resize((100, 100)) # giảm kích cỡ hình ảnh
         publisher_picture = ImageTk.PhotoImage(publisher_picture)
         self.images.append(publisher_picture)
@@ -405,7 +416,7 @@ class adminPage:
         p_right = int(s_width / 2 - window_width / 2)
         self.change_password_window.geometry(f'{window_width}x{window_height}+{p_right}+{p_top}')
         self.change_password_window.title('Đổi mật khẩu')
-        self.change_password_window.iconbitmap('images\\changepw.ico')
+        self.change_password_window.iconbitmap(os.path.join('images', 'changepw.ico'))
         self.change_password_window.configure(background='#f8f8f8')
         self.change_password_window.resizable(0, 0)
 
@@ -462,9 +473,9 @@ class adminPage:
             for user in user_data['users']:
                 if user['username'] == self.current_user['username']:
                     user['password'] = new_pass
-
+            json_file_path = os.path.join('json_file', 'users_detail.json')
             # Lưu lại json file
-            with open('json_file\\users_detail.json', 'w') as f:
+            with open(json_file_path, 'w') as f:
                 json.dump(user_data, f)
             error_message_label.config(text='Mật khẩu được cập nhật thành công.', fg='green')
         else:
@@ -475,6 +486,11 @@ class adminPage:
         # tạo một dòng phân cách giữa header và sidebar
         header_line = Frame(self.window, width=5, bg='black')
         header_line.place(relx=0.09, relheight=1)
+    def search_book(self,book_entry):
+        # Hàm xử lý khi click nút tìm kiếm
+        self.loading_label.pack(pady=10) # Hiển thị ảnh loading
+        threading.Thread(target=self.threaded_function, args=(book_entry,)).start() # Chạy tìm kiếm trong luồng riêng biệt
+
     def threaded_function(self,book_entry):
         book_to_search = book_entry.get() 
         if book_to_search.strip() != '':
@@ -497,19 +513,18 @@ class adminPage:
                         img_response = requests.get(img_url)
                         img_data = img_response.content
                         img = ImageTk.PhotoImage(Image.open(BytesIO(img_data)))
-                    
+                        print(book_info)
                         cover_label = Label(book_frame, image=img,cursor='hand2')
-                        cover_label.bind("<Button-1>", lambda e: self.show_book_detail(book_info,isOwner='api'))
+                        cover_label.bind("<Button-1>", lambda e, info=book_info: self.show_book_detail(info, isOwner='api'))
                         cover_label.image = img
                         cover_label.pack()
                         title = book_info['title']
                         if len(title) > 40:  # Adjust value as needed
                             title = title[:37] + "..."
-                            print(title,"dist")
 
 
 
-                        info_label = Label(book_frame, text=f"Title: {title}\nAuthor: {', '.join(book_info['authors'])[:30]}", justify=LEFT)  # Cut authors if too long
+                        info_label = Label(book_frame, text=f"Title: {title}\nAuthor: {', '.join(book_info['authors'])[:30]}", justify=CENTER)  # Cut authors if too long
                         info_label.pack()
                         column += 1
                         if column == 5:
@@ -607,20 +622,21 @@ class adminPage:
             button_frame = Frame(self.main_frame)
             button_frame.pack(side='top')
 
+            
             # Nút Chap trước
-            prev_chap_button = Button(button_frame, text="Chap trước", command=lambda: self.change_chap(book_info, -1))
+            prev_chap_button = Button(button_frame, text="Chap trước", command=lambda: self.change_chap(book_info, -1),   width=12, height=1, bg="#4CAF50", fg="white", font=("Arial", 10, "bold"))
             prev_chap_button.pack(side='left', padx=5, pady=5)
 
             # Nút Chap tiếp theo
-            next_chap_button = Button(button_frame, text="Chap tiếp theo", command=lambda: self.change_chap(book_info, 1))
+            next_chap_button = Button(button_frame, text="Chap tiếp theo", command=lambda: self.change_chap(book_info, 1),   width=12, height=1, bg="#4CAF50", fg="white", font=("Arial", 10, "bold"))
             next_chap_button.pack(side='left', padx=5, pady=5)
 
 
             # Nút chọn màu
-            color_button = Button(button_frame, text="Chọn màu chữ", command=self.choose_font_color)
+            color_button = Button(button_frame, text="Chọn màu chữ", command=self.choose_font_color, width=12, height=1, bg="#2196F3", fg="white", font=("Arial", 10, "bold"))
             color_button.pack(side='left', padx=5, pady=5)
 
-            background_color_button = Button(button_frame, text="Chọn màu nền", command=self.choose_background_color)
+            background_color_button = Button(button_frame, text="Chọn màu nền", command=self.choose_background_color, width=12, height=1, bg="#2196F3", fg="white", font=("Arial", 10, "bold"))
             background_color_button.pack(side='left', padx=5, pady=5)
 
             content_url = book_info.get('content_url')
@@ -656,7 +672,7 @@ class adminPage:
     def display_all_books_json(self):
     # Đọc file JSON
     
-        with open('json_file\\books_detail.json', 'r', encoding='utf-8') as f:
+        with open(os.path.join('json_file', 'books_detail.json'), 'r', encoding='utf-8') as f:
             data = json.load(f)
     
     # Xóa nội dung hiện tại của main_frame
@@ -722,7 +738,8 @@ class adminPage:
     def show_book_detail(self, book,isOwner):
         if self.window.winfo_exists():
             self.first_chapter=1
-            self.last_chapter=book['chapter']
+            if(isOwner=="json"):
+                self.last_chapter=book['chapter']
             BookDetailWindow(self.window, book, isOwner, self.show_book_content)
         else:
             # Show an error message if the adminPage window is closed
@@ -731,7 +748,7 @@ class adminPage:
     def manage_users(self):
         self.clear_main_content()
         user_columns = ("username", "password","type","email","image_path","birthday")
-        self.user_table = ManageTable(self.main_frame, "json_file\\users_detail.json", "users", user_columns,"Độc gia",True)
+        self.user_table = ManageTable(self.main_frame, os.path.join('json_file', 'users_detail.json'), "users", user_columns,"Độc gia",True)
         intermediate_frame = Frame(self.main_frame)
         intermediate_frame.pack(fill=BOTH, expand=True)
 
@@ -751,7 +768,7 @@ class adminPage:
     def manage_books(self):
         self.clear_main_content()
         book_columns = ("title", "authors", "genre", "year", "pages","image_path","chapter","content_url")
-        self.book_table = ManageTable(self.main_frame, "json_file\\books_detail.json", "books", book_columns,"Sách",allow_images=True)
+        self.book_table = ManageTable(self.main_frame, os.path.join('json_file', 'books_detail.json'), "books", book_columns,"Sách",allow_images=True)
 
 
         intermediate_frame = Frame(self.main_frame)
@@ -765,7 +782,7 @@ class adminPage:
     def manage_publishers(self):
         self.clear_main_content()
         publishers_columns = ("Pid", "name", "location", "founded_year", "website")
-        self.publishers_table = ManageTable(self.main_frame, "json_file\\publishers.json", "publishers", publishers_columns,"Sách")
+        self.publishers_table = ManageTable(self.main_frame, os.path.join('json_file', 'publishers.json'), "publishers", publishers_columns,"Sách")
         # self.publishers_table.create_edit_card()
 
         intermediate_frame = Frame(self.main_frame)
